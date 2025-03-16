@@ -3,7 +3,7 @@ Add-Type -AssemblyName System.Windows.Forms
 
 # Create the form
 $form = New-Object System.Windows.Forms.Form
-$form.Text = 'Entra Controller - Launcher'
+$form.Text = 'Entra Controller - Launcher V.0.1'
 $form.Width = 400
 $form.Height = 300
 $form.StartPosition = 'CenterScreen'
