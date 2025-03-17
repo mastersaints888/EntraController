@@ -1,75 +1,56 @@
-# Load Windows Forms assembly
-Add-Type -AssemblyName System.Windows.Forms
+# Entra Controller Launcher Script
+Clear-Host
 
-# Create the form
-$form = New-Object System.Windows.Forms.Form
-$form.Text = 'Entra Controller - Launcher V.0.1'
-$form.Width = 400
-$form.Height = 300
-$form.StartPosition = 'CenterScreen'
+Function Show-Menu {
+    cls
+    Write-Host "Select an option:"
+    Write-Host "1) Create users"
+    Write-Host "2) Create basic group"
+    Write-Host "3) Create dynamic group (option to add license)"
+    Write-Host "4) Create app registration and add users"
+    Write-Host "5) Exit"
+}
 
-# Create a label for instructions
-$label = New-Object System.Windows.Forms.Label
-$label.Text = 'Select an option to run the corresponding script:'
-$label.Width = 350
-$label.Location = New-Object System.Drawing.Point(10, 20)
-$form.Controls.Add($label)
+Function Create-Users {
+    Write-Host "Creating users..."
+    # Add the user creation logic here
+    # Example: New-AzureADUser -DisplayName "John Doe" -UserPrincipalName "john.doe@domain.com" -AccountEnabled $true
+    Read-Host "Press Enter to return to the menu"
+}
 
-# Button to Create Users
-$btnCreateUsers = New-Object System.Windows.Forms.Button
-$btnCreateUsers.Text = '1) Create Users'
-$btnCreateUsers.Width = 150
-$btnCreateUsers.Location = New-Object System.Drawing.Point(10, 60)
-$btnCreateUsers.Add_Click({
-    # Your code to create users
-    Write-Host 'Creating users...'
-    # Call your Create User function or script here
-    # For example: Create-UsersFunction
-})
-$form.Controls.Add($btnCreateUsers)
+Function Create-BasicGroup {
+    Write-Host "Creating basic group..."
+    # Add the logic for creating basic groups here
+    # Example: New-AzureADGroup -DisplayName "GroupName" -MailEnabled $false -SecurityEnabled $true
+    Read-Host "Press Enter to return to the menu"
+}
 
-# Button to Create Basic Group
-$btnCreateGroup = New-Object System.Windows.Forms.Button
-$btnCreateGroup.Text = '2) Create Basic Group'
-$btnCreateGroup.Width = 150
-$btnCreateGroup.Location = New-Object System.Drawing.Point(10, 100)
-$btnCreateGroup.Add_Click({
-    # Your code to create a basic group
-    Write-Host 'Creating basic group...'
-    # Call your Create Basic Group function or script here
-    # For example: Create-GroupFunction
-})
-$form.Controls.Add($btnCreateGroup)
+Function Create-DynamicGroup {
+    Write-Host "Creating dynamic group..."
+    # Add the logic for creating dynamic groups here
+    # Example: New-AzureADMSGroup -DisplayName "Dynamic Group" -GroupTypes @("DynamicMembership") -SecurityEnabled $true -MailEnabled $false
+    # Optionally add license assignment logic if needed
+    Read-Host "Press Enter to return to the menu"
+}
 
-# Button to Create Dynamic Group and Add License
-$btnCreateDynamicGroup = New-Object System.Windows.Forms.Button
-$btnCreateDynamicGroup.Text = '3) Create Dynamic Group & Add License'
-$btnCreateDynamicGroup.Width = 250
-$btnCreateDynamicGroup.Location = New-Object System.Drawing.Point(10, 140)
-$btnCreateDynamicGroup.Add_Click({
-    # Your code to create dynamic group
-    Write-Host 'Creating dynamic group...'
-    # Call your Dynamic Group creation function or script here
-    # For example: Create-DynamicGroupFunction
-})
-$form.Controls.Add($btnCreateDynamicGroup)
+Function Create-AppRegistrationAndAddUsers {
+    Write-Host "Creating App Registration and adding users..."
+    # Add the logic for creating an app registration and adding users here
+    # Example: New-AzureADApplication -DisplayName "AppName"
+    Read-Host "Press Enter to return to the menu"
+}
 
-# Button to Create App Registration and Add Users
-$btnCreateAppReg = New-Object System.Windows.Forms.Button
-$btnCreateAppReg.Text = '4) Create App Registration & Add Users'
-$btnCreateAppReg.Width = 250
-$btnCreateAppReg.Location = New-Object System.Drawing.Point(10, 180)
-$btnCreateAppReg.Add_Click({
-    # Your code to create app registration and add users
-    Write-Host 'Creating app registration and adding users...'
-    # Call your App Registration function or script here
-    # For example: Create-AppRegFunction
-})
-$form.Controls.Add($btnCreateAppReg)
+# Main loop
+do {
+    Show-Menu
+    $userChoice = Read-Host "Enter your choice"
 
-# Show the form
-$form.ShowDialog()
-
-
-
-# New-Object System.Windows.Forms.Button | Get-Member | Where { $_ -like "*Text*"}
+    switch ($userChoice) {
+        "1" { Create-Users }
+        "2" { Create-BasicGroup }
+        "3" { Create-DynamicGroup }
+        "4" { Create-AppRegistrationAndAddUsers }
+        "5" { Write-Host "Exiting..."; break }
+        default { Write-Host "Invalid selection. Please try again." }
+    }
+} while ($true)
