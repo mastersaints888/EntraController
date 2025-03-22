@@ -19,11 +19,109 @@ Function Create-Users {
 }
 
 Function Create-BasicGroup {
+    # Basic Security Group Parameters 
+    [CmdletBinding()]
+    param (
+        # Group type parameter 
+        [Parameter(Mandatory=$true, HelpMessage="Please Enter in a Valid GroupType case sensitive. Valid GroupTypes: UG, AR, PR")]
+        [ValidateSet('UG','AR','PR', IgnoreCase=$false)]
+        [String]
+        $GroupType,
+
+        # Assignment type is static, dynamic or function
+        [Parameter(Mandatory=$true, HelpMessage="Please Enter in a Valid GroupType case sensitive. Valid GroupTypes: UG, AR, PR")]
+        [ValidateSet('s','d','f', IgnoreCase=$false)]
+        [string]
+        $AssignmentType,
+        
+        # Group Context here ie: Azure, Entra, keyvault etc
+        [Parameter(Mandatory=$True)]
+        [ValidateSet('Azure', 'SharePoint', 'SQL', 'Teams', 'ADO', 'Entra', 'RedGate', 'KeyVault')]
+        [String]
+        $Context,
+
+        #Resource Scope Subscription
+        [Parameter(Mandatory=$True)]
+        [String]
+        $Subscription,
+        
+        #Resource scope rg
+        [Parameter(Mandatory=$false)]
+        [string]
+        $ResourceGroup,
+
+        #Resource (mostly shouldnt use this)
+        [Parameter(Mandatory=$false)]
+        [string]
+        $Resource,
+
+        #Role
+        [Parameter(Mandatory=$true)]
+        [String]
+        $Role
+    )
+
+
+    # If ResourceGroup is not provided, prompt user for input
+    if (-not $ResourceGroup) {
+        $ResourceGroup = Read-Host "Please enter the ResourceGroup (Leave blank if not required)"
+    }
+
+    # If Resource is not provided, prompt user for input
+    if (-not $Resource) {
+        $Resource = Read-Host "Please enter the Resource (Leave blank if not required)"
+    }
+
+    # Now process the rest of the parameters as normal
+    Write-Host "Group Type: $GroupType"
+    Write-Host "Assignment Type: $AssignmentType"
+    Write-Host "Context: $Context"
+    Write-Host "Subscription: $Subscription"
+    Write-Host "Role: $Role"
+
+    # If ResourceGroup and Resource are provided, handle them here
+    if ($ResourceGroup) {
+        Write-Host "Resource Group: $ResourceGroup"
+    }
+    if ($Resource) {
+        Write-Host "Resource: $Resource"
+    }
+    else {
+        Write-Host "No Resource provided."
+    }
+
+    #iF resourcegroup provided add the dot delimiter here
+    if ($ResourceGroup){
+        $ResourceGroup = ".$ResourceGroup"
+    }
+
+    #If resource provided add the dot delimiter here
+    if ($Resource){
+        $Resource = ".$Resource"
+    }
+
+    # Script to run 
+    $Delimiter = ":"
+    try {
+        New-EntraGroup -DisplayName "$GroupType$AssignmentType-$Context$Delimiter$Subscription$ResourceGroup$Resource$Delimiter$Role" `
+        -SecurityEnabled $true `
+        -Description 'tbd' `
+        -MailEnabled $false -MailNickname NotSet -IsAssignableToRole $false
+    }
+    catch {
+        Write-Host $_
+    }
+    # New-EntraGroup -DisplayName ARs-Azure:sub-SHC-Hub_Management.rg-SHC-Dev-Hub:Reader 
+    # -SecurityEnabled $true -Description 'Group Type: AR | Assignment Type: s | Context: Azure | Ressource scope: sub-SHC-Hub:Management.rg-SHC-Dev-Hub | Role: Reader' 
+    # -MailEnabled $false -MailNickname NotSet -IsAssignableToRole $false
+}
+
+
     Write-Host "Creating basic group..."
     # Add the logic for creating basic groups here
     # Example: New-AzureADGroup -DisplayName "GroupName" -MailEnabled $false -SecurityEnabled $true
     Read-Host "Press Enter to return to the menu"
-}
+
 
 Function Create-DynamicGroup {
     Write-Host "Creating dynamic group..."
@@ -54,3 +152,8 @@ do {
         default { Write-Host "Invalid selection. Please try again." }
     }
 } while ($true)
+
+
+
+
+
