@@ -177,8 +177,6 @@ Function New-SHCGroup {
     catch {
         Write-Host $_
     }
-    # New-EntraGroup -DisplayName ARs-Azure:sub-SHC-Hub_Management.rg-SHC-Dev-Hub:Reader 
-    # -SecurityEnabled $true -Description 'Group Type: AR | Assignment Type: s | Context: Azure | Ressource scope: sub-SHC-Hub:Management.rg-SHC-Dev-Hub | Role: Reader' 
-    # -MailEnabled $false -MailNickname NotSet -IsAssignableToRole $false
+   
 }
 
