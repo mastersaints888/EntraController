@@ -108,34 +108,34 @@ Function New-SHCGroup {
     ############                             ############
 
     #Set the the description variable for GroupType User 
-    if ($GroupType = "UG"){
+    if ($GroupType -eq "UG"){
         $DescGT = "GroupType: User Group | "
     }
 
     #Set the the description variable for GroupType Application ROle 
-    if ($GroupType = "AR"){
+    if ($GroupType -eq "AR"){
         $DescGT = "GroupType: Application Role | "
     }
    
    
     #Set the the description variable for GroupType PimRole
-    if ($GroupType = "PR"){
+    if ($GroupType -eq "PR"){
         $DescGT = "GroupType: Pim Role | "
     }
 
 
     #Set the the description variable for Assignment Type if static
-    if ($AssignmentType = "s"){
+    if ($AssignmentType -eq "s"){
         $DescAssType = "Assignment Type: Static | "
     }
 
     #Set the the description variable for Assignment Type if dynamic
-    if ($AssignmentType = "d"){
+    if ($AssignmentType -eq "d"){
         $DescAssType = "Assignment Type: Dynamic | "
     }
 
     #Set the the description variable for Assignment Type if Function
-    if ($AssignmentType = "f"){
+    if ($AssignmentType -eq "f"){
         $DescAssType = "Assignment Type: Function | "
     }
 
