@@ -1,3 +1,4 @@
+
 Function New-SHCGroup {
     <#
     .SYNOPSIS 
@@ -104,7 +105,7 @@ Function New-SHCGroup {
     }
 
     ############                             ############
-    ############ Defining Group Descriptions ############
+    ############ Defining Group Descriptions  ############
     ############                             ############
 
     #Set the the description variable for GroupType User 
@@ -167,8 +168,10 @@ Function New-SHCGroup {
     }
 
     #Script to run 
-    
+    Write-Debug "At line 170 Script is running"
+
     try {
+        Wait-Debugger
         New-EntraGroup -DisplayName "$GroupType$AssignmentType-$Context$Delimiter$Subscription$ResourceGroup$Resource$Delimiter$Role" `
         -SecurityEnabled $true `
         -Description "$DescGT$DescAssType$DescContext$DescSub$DescRG$DescR$DescRole" `

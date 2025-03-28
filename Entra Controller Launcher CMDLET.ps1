@@ -11,14 +11,25 @@ Function Show-Menu {
     Write-Host "5) Exit"
 }
 
-Function Create-Users {
+Function New-SHCUser {
     Write-Host "Creating users..."
     # Add the user creation logic here
     # Example: New-AzureADUser -DisplayName "John Doe" -UserPrincipalName "john.doe@domain.com" -AccountEnabled $true
     Read-Host "Press Enter to return to the menu"
 }
 
-Function Create-BasicGroup {
+Function New-SHCGroup {
+    <#
+    .SYNOPSIS 
+    Supplemental Health Care group creation tool
+    .DESCRIPTION
+    Supplemental Healthcare Group Structure cmdlet for quick and easy group creation with Valid sets and Case checking To easily adhear to naming schemas 
+    .PARAMETER GroupType 
+    Please Enter in a Valid GroupType case sensitive. Valid GroupTypes: UG, AR, PR
+    .EXAMPLE
+    Create-SHCGroup -GroupType UG -AssignmentType d -Context Azure -Subscription Sub-Dev-TRM -ResourceGroup rg-resourcegroup_name -Resource my_resource -Role my_role
+    UGd-Azure:Sub-Dev-TRM.rg-resourcegroup.resource 
+    #>
     # Basic Security Group Parameters 
     [CmdletBinding()]
     param (
@@ -123,7 +134,7 @@ Function Create-BasicGroup {
     Read-Host "Press Enter to return to the menu"
 
 
-Function Create-DynamicGroup {
+Function New-SHCDynamicGroup {
     Write-Host "Creating dynamic group..."
     # Add the logic for creating dynamic groups here
     # Example: New-AzureADMSGroup -DisplayName "Dynamic Group" -GroupTypes @("DynamicMembership") -SecurityEnabled $true -MailEnabled $false
@@ -131,7 +142,7 @@ Function Create-DynamicGroup {
     Read-Host "Press Enter to return to the menu"
 }
 
-Function Create-AppRegistrationAndAddUsers {
+Function New-SHCAppReg {
     Write-Host "Creating App Registration and adding users..."
     # Add the logic for creating an app registration and adding users here
     # Example: New-AzureADApplication -DisplayName "AppName"
@@ -144,10 +155,10 @@ do {
     $userChoice = Read-Host "Enter your choice"
 
     switch ($userChoice) {
-        "1" { Create-Users }
-        "2" { Create-BasicGroup }
-        "3" { Create-DynamicGroup }
-        "4" { Create-AppRegistrationAndAddUsers }
+        "1" { New-SHCUser }
+        "2" { New-SHCGroup }
+        "3" { New-SHCDynamicGroup }
+        "4" { New-SHCAppReg }
         "5" { Write-Host "Exiting..."; break }
         default { Write-Host "Invalid selection. Please try again." }
     }

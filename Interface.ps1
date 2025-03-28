@@ -30,6 +30,7 @@ Function Create-DynamicGroup {
     # Add the logic for creating dynamic groups here
     # Example: New-AzureADMSGroup -DisplayName "Dynamic Group" -GroupTypes @("DynamicMembership") -SecurityEnabled $true -MailEnabled $false
     # Optionally add license assignment logic if needed
+    s
     Read-Host "Press Enter to return to the menu"
 }
 
