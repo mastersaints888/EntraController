@@ -64,13 +64,13 @@ catch {
 #ask user for sub
 $Subs = Get-AzSubscription
 $Subs
-$Subscription = Read-Host "Please paste in the subscription ID from above: "
+$Subscription = Read-Host "Please paste in the subscription ID from above"
 Select-AzSubscription -Subscription $Subscription
 
 #Store username and password in keyvault
 Get-AzKeyVault -SubscriptionId $Subscription | Select-Object VaultName | Format-Table
-$KV = Read-Host "Please select a vault from your subscription:"
-Write-Host "Please put aruguments where Name is the Key Name and Password is key Password"
+$KV = Read-Host "Please select a vault from your subscription"
+Write-Host "Please put aruguments where Name is the Key Name and Password is the keys Secret"
 
 
 $cred = Get-Credential 
