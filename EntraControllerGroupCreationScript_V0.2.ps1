@@ -76,11 +76,11 @@ do {
 
 # Optional processing
 if ($ResourceGroup) {
-    $ResourceGroup = "$ResourceGroup"
+    $ResourceGroupDisplayName = ".$ResourceGroup"
 }
 
 if ($Resource) {
-    $Resource = "$Resource"
+    $ResourceDisplayName = ".$Resource"
 }
 
     ############                             ############
@@ -148,7 +148,7 @@ if ($Resource) {
 
 # Combine variables for the group name
 $Delimiter = ":"
-$DisplayName = "$GroupType$AssignmentType-$Context$Delimiter$Subscription.$ResourceGroup.$Resource$Delimiter$Role"
+$DisplayName = "$GroupType$AssignmentType-$Context$Delimiter$Subscription$ResourceGroupDisplayName$ResourceDisplayName$Delimiter$Role"
 $Description = "$DescGT$DescAssType$DescContext$DescSub$DescRG$DescR$DescRole"
 
 try {
