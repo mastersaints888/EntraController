@@ -20,7 +20,16 @@ $FilterOperators = @(
     "-notMatch", "-match", "-in", "-notIn"
 )
 
+#define and/or operators for the rules
+$AndOrOperand = @(
+    "or", "and", ""
+)
+
+#Set and or operator variable as global so it can be used outside of the func
+$Global:AddExpression = $null
+
 function Get-UserSelection {
+    
     param (
         [string]$Prompt,
         [array]$Options
@@ -35,25 +44,106 @@ function Get-UserSelection {
         # Create a ref variable to hold the parsed int
         [int]$parsed = 0
         $isValidNumber = [int]::TryParse($selection, [ref]$parsed)
+        # this is an invalid inpuut check while condition
         } while (-not $isValidNumber -or $parsed -lt 1 -or $parsed -gt $Options.Count)
 
 # Return the selected option
 return $Options[$parsed - 1]
 }
 
+function Get-UserAndOr {
+    param (
+        [string]$Prompt,
+        [Parameter(Mandatory = $False)]
+        [array]$Options
+    )
+    Write-Host "`n$Prompt"
+    for ($i = 0; $i -lt $Options.Count; $i++) {
+        Write-Host "$($i+1). $($Options[$i])"
+    }
+
+    do {
+        $selection = Read-Host "if you would like to add another querry, Enter Number OR type '3' to continue to group creation"
+        # Create a ref variable to hold the parsed int
+        [int]$parsed = 0
+        $isValidNumber = [int]::TryParse($selection, [ref]$parsed)
+
+        # this is an invalid inpuut check while condition
+        } while (-not $isValidNumber -or $parsed -lt 1 -or $parsed -gt $Options.Count)
+
+# Return the selected option
+return $Options[$parsed - 1]
+
+}
+
+
 # Step 1: Get user input to build the rule
-$SelectedProperty = Get-UserSelection -Prompt "Select a user property for dynamic rule:" -Options $ValidProperty
-$SelectedOperator = Get-UserSelection -Prompt "Select an operator:" -Options $FilterOperators
-$Value = Read-Host "Enter the value to compare (use null for null checks, or surround string with quotes if needed)"
+
+#Array to store possibly multiple dynamic querries 
+$Array = @()
+
+while ($true) {
+    # Prompt user to build the rule
+    $Answer = Read-Host "Add a Dynamic query? (Y/N)"
+    $Answer = $Answer.ToUpper()
+
+    try {
+        if ($Answer -eq "Y") {
+            # Prompt user for each part of the dynamic query
+            $SelectedProperty  = Get-UserSelection -Prompt "Select a user property for dynamic rule:" -Options $ValidProperty
+            $SelectedOperator  = Get-UserSelection -Prompt "Select an operator:" -Options $FilterOperators
+            $Value             = Read-Host "Enter the value to compare (use null for null checks, or surround string with quotes if needed)"
+            $Global:AddExpression = Get-UserAndOr -Prompt "If this is a single rule, press type '3' to proceed to group creation" -Options $AndOrOperand
+            # As soon as input is collected, add it to the array
+            $QueryLogic = [PSCustomObject]@{
+                Property = $SelectedProperty
+                Operator = $SelectedOperator
+                Value    = $Value
+                AdditionalLogic = $Global:AddExpression
+            }
+
+            # Add to the array
+            $Array += $QueryLogic
+
+            # Print current state of the array
+            Write-Host "`nCurrent dynamic queries:"
+            $Array | Format-Table -AutoSize
+        }
+        elseif ($Answer -eq "N") {
+            break
+        }
+        else {
+            Write-Host "Invalid operator, please choose Y/N"
+        }
+    }
+    catch {
+        Write-Host "An error occurred: $_.Exception.Message"
+    }
+}
+
+
+#This will convert to json so we can work with the strings
+$Array | ConvertTo-Json -Compress
+
+#building out all objects into strings for passing into the command
+$Rule = foreach($item in $Array){
+    $line = "(user.$($item.Property) $($item.Operator) $($item.Value)) $($item.AdditionalLogic)"
+    Write-Output $line
+}
+
 
 # Step 2: Build rule string
-$Rule = "(user.$SelectedProperty $SelectedOperator $Value)"
+$Rule
+
 Write-Host "`nGenerated Dynamic Membership Rule:" -ForegroundColor Cyan
 Write-Host $Rule -ForegroundColor Green
 
+
 # Step 3: Optional group creation
 $DoCreate = Read-Host "Do you want to create a new group with this rule? (Y/N)"
-if ($DoCreate.ToUpper() -eq "Y") {
+
+try {
+    if ($DoCreate.ToUpper() -eq "Y") {
     $DisplayName = Read-Host "Enter Display Name for the new group"
     $MailNickname = ($DisplayName -replace '\s+', '') + (Get-Random -Minimum 1000 -Maximum 9999)
 
@@ -63,10 +153,15 @@ if ($DoCreate.ToUpper() -eq "Y") {
         -SecurityEnabled `
         -GroupTypes "DynamicMembership" `
         -MembershipRuleProcessingState "On" `
-        -MembershipRule $Rule
-
-    Write-Host "`n✅ Group created successfully!" -ForegroundColor Green
+        -MembershipRule "$Rule" #"$Rule"
+    $Group
+    Write-Host "`n Group created successfully!" -ForegroundColor Green
     #$Group
 } else {
     Write-Host "No group was created. You can use the rule elsewhere:" -ForegroundColor Yellow
 }
+}
+catch {
+    Write-Host $_.Exception.Message
+}
+
