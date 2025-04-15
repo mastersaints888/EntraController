@@ -104,6 +104,7 @@ while ($true) {
 
             # Add to the array
             $Array += $QueryLogic
+            
 
             # Print current state of the array
             Write-Host "`nCurrent dynamic queries:"
@@ -141,6 +142,7 @@ Write-Host $Rule -ForegroundColor Green
 
 # Step 3: Optional group creation
 $DoCreate = Read-Host "Do you want to create a new group with this rule? (Y/N)"
+$securityEnabled = $true  # Required for dynamic groups
 
 try {
     if ($DoCreate.ToUpper() -eq "Y") {
@@ -150,7 +152,7 @@ try {
     $Group = New-MgGroup -DisplayName $DisplayName `
         -MailEnabled:$false `
         -MailNickname $MailNickname `
-        -SecurityEnabled `
+        -SecurityEnabled:$securityEnabled `
         -GroupTypes "DynamicMembership" `
         -MembershipRuleProcessingState "On" `
         -MembershipRule "$Rule" #"$Rule"
