@@ -1,0 +1,9 @@
+﻿ManagementGroupName,SubscriptionName,ResourceGroupName,RoleName,PrincipalName
+My Test Management Group,,,Reader,bsmith@shclabtenant.onmicrosoft.com
+Tenant Root Group,,,Reader,user3@shclabtenant.onmicrosoft.com
+,Azure subscription 1,,Reader,bsmith@shclabtenant.onmicrosoft.com
+,Azure subscription 1,b2c-RG,Key Vault Crypto User,user5@shclabtenant.onmicrosoft.com
+,Subscription 2,,Azure Kubernetes Service RBAC Admin,user6@shclabtenant.onmicrosoft.com
+,Subscription 2,rg-sub2-test,Log Analytics Contributor,bsmith@shclabtenant.onmicrosoft.com
+,Subscription 3,,Key Vault Secrets User,bsmith@shclabtenant.onmicrosoft.com
+,Subscription 3,rg-sub3-test,Key Vault Reader,bsmith@shclabtenant.onmicrosoft.com
