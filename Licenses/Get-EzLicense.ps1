@@ -11,7 +11,9 @@ catch {
 function Get-EzLicense {
 param (
     [hashtable]
-    $skuLookup
+    $skuLookup,
+    [switch]
+    $Pretty
 )
 
 
@@ -51,6 +53,11 @@ foreach ($sku in $skus) {
         
     }
 }
+
+    #pretty output switch will format it in a nice table for the user to see at the bottom
+    if ($pretty) {
+        Get-EzLicense | Select-Object ConsumedUnits, PrepaidUnits, FriendlyName, skupartnumber | Format-Table
+    }
 
 }
 
@@ -103,20 +110,30 @@ function Set-EzLicenseUserSelection {
 
     $OptionsArray += Get-EzLicense
     
-    $OutputOptions = $OptionsArray.FriendlyName
+    $OutputOptions = @()
+
+    #Creating a table with friendlyname and a fallback if friendlyname doesnt exist to skupartnumber
+    foreach($Option in $OptionsArray) {
+    $OutputOptions += [PSCustomObject]@{
+        FriendlyName = $Option.FriendlyName
+        BackupName   = $Option.SkuPartNumber
+    }
+    }
     
     #here i am accounting for possible null values
     
     foreach($Option in $OutputOptions){
         try {
             #If null we must account for that 
-            if($null -eq $Option){
-            $Option = "Not Available"
+            if(-not $Option.FriendlyName){
+            $Option = $Option.BackupName
         }
+            if($Option.FriendlyName){
+                $Option = $Option.FriendlyName
+            }
 
-            $Options += [PSCustomObject]@{
-                FriendlyName = $Option
-        }
+            $Options += $Option
+        
 
     }
         catch {
@@ -124,7 +141,7 @@ function Set-EzLicenseUserSelection {
         }
     }
 
-    $Options = $Options.FriendlyName
+    $Options 
 
     
     
@@ -197,20 +214,30 @@ $SelectedGuid
 
 
 #Get the output here for all security groups 
-$GroupSelection = @{}
-$AllGroups = Get-MgGroup -Filter "securityEnabled eq true"
+$GroupSelection = @()
+$AllGroups = Get-MgGroup -All
+
+
+# Get all groups where SecurityEnabled is $true
+$AllGroups = Get-MgGroup -All | Where-Object { $_.SecurityEnabled -eq $true }
 
 
 foreach($Group in $AllGroups){
         
-    $GroupSelection[$Group.DisplayName] = $Group.Id
+    $GroupSelection += [PSCustomObject]@{
+        DisplayName = $Group.DisplayName
+        Id = $Group.Id
+        securityEnabled = $Group.SecurityEnabled
+    }
 } 
 
+$GroupSelection | Sort-Object -Descending DisplayName | Format-Table
+
 #sort the security group hashtable
-$GroupSelection.GetEnumerator() | Sort-Object Key -Descending
+#$GroupSelection.GetEnumerator() | Sort-Object Key -Descending
 
 
-Start-Sleep -Seconds 2
+Start-Sleep -Seconds 10
 
 $GroupID = Read-Host "Please paste in a group ID to apply the licesne to" 
 
@@ -260,5 +287,5 @@ catch {
 
 
 
-
+#Get-EzLicense | Select-Object ConsumedUnits, PrepaidUnits, FriendlyName
 
