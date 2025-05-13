@@ -114,6 +114,15 @@ if ($show) {
 
 function Get-RbacCache {
 
+    param(
+        [switch]
+        $subcache,
+
+        [switch]$mancache,
+
+        [switch]$rgcache
+    )
+
     #cash the subscriptions
     $subscriptionsCache = @{}
     Get-AzSubscription | ForEach-Object {
@@ -152,6 +161,18 @@ function Get-RbacCache {
 
     }
 
+    if($subcache){
+        return $subscriptionsCache
+    }
+
+    if($mancache){
+        return $mgCache
+    }
+
+    if($rgcache){
+        return $resourceGroupsCache
+    }
+
     #Return a master hashtable with all sub-caches
     return @{
         Subscriptions    = $subscriptionsCache
@@ -160,6 +181,8 @@ function Get-RbacCache {
         Principals       = $principalCache
         ManagementGroups = $mgCache
     }
+
+    
 }
 
 
@@ -235,7 +258,28 @@ function Set-EzBulkRbac {
 
 #endregion
 
+function Get-UserSelection {
+    
+    param (
+        [string]$Prompt,
+        [array]$Options
+    )
+    Write-Host "`n$Prompt"
+    for ($i = 0; $i -lt $Options.Count; $i++) {
+        Write-Host "$($i+1). $($Options[$i])"
+    }
 
+    do {
+        $selection = Read-Host "Enter the number of your choice"
+        # Create a ref variable to hold the parsed int
+        [int]$parsed = 0
+        $isValidNumber = [int]::TryParse($selection, [ref]$parsed)
+        # this is an invalid inpuut check while condition
+        } while (-not $isValidNumber -or $parsed -lt 1 -or $parsed -gt $Options.Count)
+
+# Return the selected option
+return $Options[$parsed - 1]
+}
 
 
 #region Get-EzRbacReport
@@ -245,18 +289,58 @@ function Get-EzRbacReport {
 
 param( 
     [switch]
-    $Show
+    $Show,
+    [switch]$cleanview
 )
 
-#$Cache = Get-RbacCache
+$SubCache = @{}
+$SubCache += Get-RbacCache -subcache
+
+$MgCache = @{}
+$MgCache += Get-RbacCache -mancache
+
+#foreach($Sub in $Cache.)
+
+
+#building out a report cache for all subs root and resource groups then need to throw into the Get-AzRoleAssignment -scope 
 
 
 
-$TenantRoles = Get-AzRoleAssignment 
 
-$Report = @()
-$TenantRoles | ForEach-Object {
-    $Report += [PSCustomObject]@{
+$EnvPath = $env:USERPROFILE 
+
+While ($true){
+
+    $Prompt = Get-UserSelection -Options @("Root", "Sub", "ManagementGroup", "AllTenant")
+
+    switch ($Prompt) {
+    "Root" {
+        $Report = Get-AzRoleAssignment -Scope "/"
+    }
+    "Sub" {
+        $SubscriptionName = Get-UserSelection -Options $SubCache.Keys
+        $SubscriptionId = $SubCache["$SubscriptionName"]
+        $Report = Get-AzRoleAssignment -Scope "/subscriptions/$SubscriptionId"
+    }
+    "ManagementGroup" { 
+        $MgGroupName = Get-UserSelection -Options $MgCache.Keys
+        $MgId = $MgCache["$MgGroupName"]
+        $Report = Get-AzRoleAssignment -Scope "$MgId"
+    }
+    "AllTenant" {
+        $Report = @()
+        foreach($sub in $SubCache.Values){
+            $Report += Get-AzRoleAssignment -Scope "/subscriptions/$sub"
+        }
+    }
+}
+
+$ReportOut = $Report
+
+if($cleanview){  #Clean output view switch 
+    $ReportOut = @()
+    $Report | ForEach-Object {
+        $ReportOut += [PSCustomObject]@{
         Type        = $_.ObjectType
         UPN         = $_.SignInName
         DisplayName = $_.DisplayName
@@ -264,6 +348,7 @@ $TenantRoles | ForEach-Object {
         RoleName    = $_.RoleDefinitionName  
         Scope       = $_.Scope
         
+        }
     }
 }
 
@@ -274,24 +359,44 @@ if ($Show){
 }
 
 
-$EnvPath = $env:USERPROFILE 
+    $FileName = Read-Host "Please enter the name of your file, DO NOT include .csv"
 
-$FileName = Read-Host "Please enter the name of your file, DO NOT include .csv"
 
-try{
-#Report Generation
+    ###Report Generation####
+    try{
+    
 
-Write-Host -ForegroundColor Yellow "Generating RBAC Report..."
-$Report | Export-Csv -Path "$EnvPath\Downloads\$FileName.csv"
-Write-Host -ForeGroundColor Green "Successfully Generated Report at $EnvPath\Downloads\$FileName.csv"
+    Write-Host -ForegroundColor Yellow "Generating RBAC Report..."
+    $ReportOut | Export-Csv -Path "$EnvPath\Downloads\$FileName.csv"
+    Write-Host -ForeGroundColor Green "Successfully Generated Report at $EnvPath\Downloads\$FileName.csv"
+    
+    #Report loop/exit prompt 
+    # Report loop/exit prompt
+$validResponse = $false
+do {
+    $ReportPrompt = Read-Host "Would you like to generate another report? Y/N"
+
+    switch ($ReportPrompt.ToUpper()) {
+        "Y" {
+            $validResponse = $true
+        }
+        "N" {
+            exit
+        }
+        default {
+            Write-Host "Invalid input. Please enter Y or N."
+        }
+    }
+} while (-not $validResponse)
 
 }
-catch
-{ Write-Host "Something went wrong during the geration of the report: $_.Exception" }
+    catch
+    { Write-Host "Something went wrong during the geration of the report: $_.Exception" }
 
 
 
 }
-
+}
 
 #"$env:USERPROFILE\Downloads\rbaccache.txt"
+#Get-EzRbacReport
