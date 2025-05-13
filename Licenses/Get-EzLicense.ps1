@@ -44,6 +44,11 @@ foreach ($sku in $skus) {
     $skuGuid = $sku.SkuId       # GUID
     $friendlyName = $skuLookup[$skuId]
 
+    #logic for missing friendlyname
+    if(-not $friendlyName){
+        $friendlyName = $sku.SkuPartNumber
+    }
+
     [PSCustomObject]@{
         FriendlyName  = $friendlyName
         ConsumedUnits = $sku.ConsumedUnits
@@ -81,7 +86,7 @@ function Get-ValidOptions {
     foreach ($Option in $OptionsArray) {
         try {
             if ($null -eq $Option.FriendlyName) {
-                $Option.FriendlyName = "Not Available"
+                $Option.FriendlyName = $Option.SkuPartNumber
             }
             $Options[$Option.FriendlyName] = $Option.SkuGuid
         }
@@ -90,7 +95,7 @@ function Get-ValidOptions {
         }
     }
 
-    $Options
+    return $Options
 }
 
 
@@ -104,47 +109,35 @@ function Set-EzLicenseUserSelection {
         [string]$Prompt,
         [array]$Options
     )
+ #fill the options into an array with the available licenses in the tenant
+ $OptionsArray = @()
 
-    #fill the options into an array with the available licenses in the tenant
-    $OptionsArray = @()
+ $OptionsArray += Get-EzLicense
+ 
+ $OutputOptions = $OptionsArray.FriendlyName
+ 
+ #here i am accounting for possible null values
+ 
+ foreach($Option in $OutputOptions){
+     try {
+         #If null we must account for that 
+         if($null -eq $Option){
+         $Option = "Not Available"
+     }
 
-    $OptionsArray += Get-EzLicense
-    
-    $OutputOptions = @()
+         $Options += [PSCustomObject]@{
+             FriendlyName = $Option
+     }
 
-    #Creating a table with friendlyname and a fallback if friendlyname doesnt exist to skupartnumber
-    foreach($Option in $OptionsArray) {
-    $OutputOptions += [PSCustomObject]@{
-        FriendlyName = $Option.FriendlyName
-        BackupName   = $Option.SkuPartNumber
-    }
-    }
-    
-    #here i am accounting for possible null values
-    
-    foreach($Option in $OutputOptions){
-        try {
-            #If null we must account for that 
-            if(-not $Option.FriendlyName){
-            $Option = $Option.BackupName
-        }
-            if($Option.FriendlyName){
-                $Option = $Option.FriendlyName
-            }
+ }
+     catch {
+         Write-Host "An Error has occured $_"
+     }
+ }
 
-            $Options += $Option
-        
+ $Options = $Options.FriendlyName
 
-    }
-        catch {
-            Write-Host "An Error has occured $_"
-        }
-    }
-
-    $Options 
-
-    
-    
+    #User prompt 
     Write-Host "`n$Prompt"
     for ($i = 0; $i -lt $Options.Count; $i++) {
         Write-Host "$($i+1). $($Options[$i])"
@@ -231,13 +224,15 @@ foreach($Group in $AllGroups){
     }
 } 
 
+Write-Host -ForegroundColor Yellow "Attempting to grab groups..."
+
 $GroupSelection | Sort-Object -Descending DisplayName | Format-Table
 
 #sort the security group hashtable
 #$GroupSelection.GetEnumerator() | Sort-Object Key -Descending
 
 
-Start-Sleep -Seconds 10
+Start-Sleep -Seconds 3
 
 $GroupID = Read-Host "Please paste in a group ID to apply the licesne to" 
 
