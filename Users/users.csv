@@ -1,0 +1,19 @@
+﻿userPrincipalName,DisplayName,Password,AccountEnabled,FirstName,LastName,JobTitle,CompanyName,Department,UserType,EmployeeType,UsageLocation
+autotest9@shclabtenant.onmicrosoft.com,Auto9,f39aldf90w4!2,TRUE,fname,,Chief Executive Officer (CEO),,,Member,Contractor,US
+autotest10@shclabtenant.onmicrosoft.com,Auto10,f39aldf90w4!4,TRUE,Ava,lname,Chief Financial Officer (CFO),,,Guest,Consultant,US
+autotest11@shclabtenant.onmicrosoft.com,Auto11,f39aldf90w4!5,TRUE,Liam,,Marketing Manager,,Human Resources (HR),Guest,Consultant,US
+autotest12@shclabtenant.onmicrosoft.com,Auto12,f39aldf90w4!6,TRUE,Sophia,Johnson,Sales Representative,,Marketing,Guest,Consultant,US
+autotest13@shclabtenant.onmicrosoft.com,Auto13,f39aldf90w4!7,TRUE,Noah,Smith,Software Engineer,,Sales,Guest,Consultant,US
+autotest14@shclabtenant.onmicrosoft.com,Auto14,f39aldf90w4!8,TRUE,Olivia,Williams,Product Manager,,Finance,,Consultant,US
+autotest15@shclabtenant.onmicrosoft.com,Auto15,f39aldf90w4!9,FALSE,James,Brown,Human Resources Director,Blue Horizon Technologies,IT (Information Technology),,Consultant,US
+autotest16@shclabtenant.onmicrosoft.com,Auto16,f39aldf90w4!10,TRUE,Emma,Davis,Customer Support Specialist,Blue Horizon Technologies,Customer Service,,Consultant,US
+autotest17@shclabtenant.onmicrosoft.com,Auto17,f39aldf90w4!11,TRUE,Benjamin,Miller,Data Analyst,Blue Horizon Technologies,Legal,,,US
+autotest18@shclabtenant.onmicrosoft.com,Auto18,f39aldf90w4!12,TRUE,Mia,Wilson,Business Development Manager,Blue Horizon Technologies,Product Development,,,US
+autotest19@shclabtenant.onmicrosoft.com,Auto19,f39aldf90w4!13,TRUE,Lucas,Moore,Content Strategist,SilverLeaf Innovations,Operations,Guest,,US
+autotest24@shclabtenant.onmicrosoft.com,Auto20,f39aldf90w4!14,TRUE,Isabella,Taylor,Project Coordinator,Quantum Dynamics,R&D (Research and Development),,,US
+autotest25@shclabtenant.onmicrosoft.com,Auto21,f39aldf90w4!15,TRUE,Elijah,Anderson,Graphic Designer,Pinecrest Solutions,,,,
+autotest26@shclabtenant.onmicrosoft.com,Auto22,f39aldf90w4!16,TRUE,Amelia,,Operations Manager,Velocity Ventures,,,,
+autotest27@shclabtenant.onmicrosoft.com,Auto23,f39aldf90w4!17,TRUE,Mason,,IT Support Specialist,Velocity Ventures,,,,
+autotest28@shclabtenant.onmicrosoft.com,Auto24,f39aldf90w4!18,TRUE,Harper,,,Velocity Ventures,,,,
+autotest29@shclabtenant.onmicrosoft.com,Auto25,f39aldf90w4!19,TRUE,johnny,rebel,,,,,,
+autotest30@shclabtenant.onmicrosoft.com,Auto26,f39aldf90w4!20,TRUE,madison,smith,,,,,,
