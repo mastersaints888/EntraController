@@ -1,5 +1,8 @@
-Connect-MgGraph -UseDeviceAuthentication
+Import-module -name Microsoft.Entra
+Connect-Entra
+#Connect-MgGraph -UseDeviceAuthentication
 
+function Get-EzContactInfo {
 # Ask user for the UPN
 $UserUPN = Read-Host "Please enter the UPN of the user in question to show its Entra Identity-based attributes"
 
@@ -54,3 +57,5 @@ foreach ($Prop in $ContactInfoAttributes) {
 
 # Show output
 $ArrayConactInfo | Format-Table -AutoSize
+
+}

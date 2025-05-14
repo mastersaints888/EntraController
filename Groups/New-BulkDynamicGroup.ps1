@@ -1,5 +1,7 @@
-Connect-MgGraph
+#Connect-MgGraph
 #Install-Module -Name ImportExcel
+function New-BulkDynamicGroup {
+
 Import-Module -Name ImportExcel
 
 #open excel file for user to edit
@@ -99,8 +101,12 @@ foreach ($group in $DGs) {
         
         #$mailEnabled = $group.MailEnabled
         
-        $securityEnabled = $true  # Required for dynamic groups
-        $mailNickname = ($group.DisplayName -replace '\s+', '') + (Get-Random -Minimum 1000 -Maximum 9999)
+        $securityEnabled = $true  
+
+        #Clean DisplayName: remove non-alphanumerics and compress spaces
+        $baseNickname = ($group.DisplayName -replace '[^a-zA-Z0-9]', '') 
+        $mailNickname = "$baseNickname$(Get-Random -Minimum 1000 -Maximum 9999)"
+
         
         # Grab rule per group for imported object
         $memRule = $group.GroupQuery
@@ -128,3 +134,4 @@ foreach ($group in $DGs) {
     }
 }
 
+}

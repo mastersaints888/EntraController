@@ -1,5 +1,7 @@
 function Get-EzIdentityAttribute {
-Connect-MgGraph -UseDeviceAuthentication
+    #Import-Module -Name Microsoft.Entra -ErrorAction Stop
+    #Connect-Entra
+    #Connect-MgGraph -UseDeviceAuthentication
 #Ask user for the upn 
 $UserUPN = Read-Host "Please enter the UPN of the user in question to show its Entra Identity based attributes"
 

@@ -1,4 +1,4 @@
-Connect-MgGraph -UseDeviceAuthentication
+function Get-EzOnPremExtAttribute {
 
 # Ask user for the UPN
 $UserUPN = Read-Host "Please enter the UPN of the user in question to show its on prem stored attributes in Entra"
@@ -59,3 +59,5 @@ foreach($Attribute in $Values){
 }
 
 $ArrayOnPremExtAttributes | Format-List
+
+}

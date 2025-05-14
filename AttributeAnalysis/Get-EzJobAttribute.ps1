@@ -1,5 +1,6 @@
 Connect-MgGraph -UseDeviceAuthentication
 
+function Get-EzJobAttribute {
 # Ask user for the UPN
 $UserUPN = Read-Host "Please enter the UPN of the user in question to show its Entra Identity-based attributes"
 
@@ -65,3 +66,5 @@ foreach ($Prop in $JobInfoAttributeValues) {
 
 # Show output
 $ArrayJobAttributes | Format-Table -AutoSize
+
+}

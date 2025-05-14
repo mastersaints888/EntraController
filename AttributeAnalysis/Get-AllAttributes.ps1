@@ -1,8 +1,12 @@
+Import-Module -Name Microsoft.Entra
+Connect-Entra
+Connect-MgGraph -UseDeviceAuthentication
 
-#ask user to input the userId
+# Ask user for the UPN
+$UserUPN = Read-Host "Please enter the UPN of the user in question to show its on prem stored attributes in Entra"
 
 #Convert all output to csv is the only way to work with each individual object here 
-$AllAttributes = @(
+$AllAttributesValues = @(
      "mail",
      "officeLocation",
      "surname",
@@ -147,16 +151,40 @@ $AllAttributes = @(
      "AdditionalProperties"
  )
 
-#get all the users attributes 
- #$UserAttributes = Get-EntraUser -UserId "219579df-5349-451b-9593-efcdcb25056e" -Property * | Format-List
- 
- #loop through and grab each attribute 
- 
-     
-     foreach($Prop in $AllAttributes){
-          Get-EntraUser -UserId "b769f322-0a55-4c19-a5d0-fda01de85653" -Property $Prop | Select-Object -ExpandProperty $Prop
-      } 
+# Initialize output array
+$ArrayAllAttributes = @()
 
+# Loop through each attribute
+foreach ($Prop in $AllAttributesValues) {
+    $Value = $null
 
+    try {
+        switch ($Prop) {
+            default {
+                $Result = Get-EntraUser -UserId $UserUPN -Property $Prop | Select-Object $Prop -ExpandProperty $Prop
+                $Value = $Result.$Prop
+            }
+        }
+    }
+    catch {
+        Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN, $Prop may not be applied $_.Exception"
+        $Value = "N/A"
+    }
 
+    # Normalize value (if still null or empty)
+    if (-not $Value) {
+        $Value = "N/A"
+    }
 
+    # Add object to array
+    $ArrayAllAttributes += [PSCustomObject]@{
+        Attribute = $Prop
+        Value     = ($Value -join ', ')
+    }
+}
+
+# Show output
+$ArrayAllAttributes | Format-Table -AutoSize
+
+#Get-EntraUser -UserId "kdavignon@shclabtenant.onmicrosoft.com" -Property Settings | Select-Object -ExpandProperty Settings
+#Get-MgUserSetting -UserId "kdavignon@shclabtenant.onmicrosoft.com"

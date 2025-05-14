@@ -1,8 +1,10 @@
-Import-Module Microsoft.Graph.Groups
-Connect-MgGraph
-Import-Module Az.Accounts
+#Import-Module Microsoft.Graph.Groups
+#Connect-MgGraph
+#Import-Module Az.Accounts
 
 # Define allowed properties
+function New-EzDynamicGroup { 
+
 $ValidProperty = @(
     "accountEnabled","dirSyncEnabled","city", "country", "companyName", "department", "displayName",
     "employeeId", "facsimileTelephoneNumber", "givenName", "jobTitle",
@@ -92,8 +94,8 @@ while ($true) {
             # Prompt user for each part of the dynamic query
             $SelectedProperty  = Get-UserSelection -Prompt "Select a user property for dynamic rule:" -Options $ValidProperty
             $SelectedOperator  = Get-UserSelection -Prompt "Select an operator:" -Options $FilterOperators
-            $Value             = Read-Host "Enter the value to compare (use null for null checks, or surround string with quotes if needed)"
-            $Global:AddExpression = Get-UserAndOr -Prompt "If this is a single rule, press type '3' to proceed to group creation" -Options $AndOrOperand
+            $Value             = Read-Host "Enter the value - if BOOLEANS do NOT use quotes, If STRING value use quotes!"
+            $Global:AddExpression = Get-UserAndOr -Prompt "IMPORTANT: press type '3' to proceed to group creation. Press 1 or 2 to add additional Logic" -Options $AndOrOperand
             # As soon as input is collected, add it to the array
             $QueryLogic = [PSCustomObject]@{
                 Property = $SelectedProperty
@@ -146,12 +148,15 @@ $securityEnabled = $true  # Required for dynamic groups
 
 try {
     if ($DoCreate.ToUpper() -eq "Y") {
-    $DisplayName = Read-Host "Enter Display Name for the new group"
-    $MailNickname = ($DisplayName -replace '\s+', '') + (Get-Random -Minimum 1000 -Maximum 9999)
+    $DisplayName = Read-Host "Enter Display Name for the new group, No quotes needed"
+     
+    #Clean DisplayName: remove non-alphanumerics and compress spaces
+    $baseNickname = ($DisplayName -replace '[^a-zA-Z0-9]', '') 
+    $mailNickname = "$baseNickname$(Get-Random -Minimum 1000 -Maximum 9999)"
 
     $Group = New-MgGroup -DisplayName $DisplayName `
         -MailEnabled:$false `
-        -MailNickname $MailNickname `
+        -MailNickname $mailNickname `
         -SecurityEnabled:$securityEnabled `
         -GroupTypes "DynamicMembership" `
         -MembershipRuleProcessingState "On" `
@@ -167,3 +172,4 @@ catch {
     Write-Host $_.Exception.Message
 }
 
+}
