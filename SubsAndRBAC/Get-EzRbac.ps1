@@ -196,6 +196,40 @@ function Set-EzBulkRbac {
         [switch]$DryRun
     )
 
+    Write-Host -ForegroundColor Yellow "Attempting to open up excel Dynamic groups database..."
+
+    Start-Process "$env:USERPROFILE\Documents\EntraController\SubsAndRBAC\rbac.csv"
+
+    #set confirmation for breaking the loop if Y is selected
+$Confirmed = $false
+
+#user prompt
+    while (-not $Confirmed) {
+       
+        
+        try {
+
+            $P = Read-Host "Please build out your RBAC Framework, save the csv and exit the csv. type Y when finished (or type Q to quit)"
+
+            switch ($P.ToUpper()) {
+                "Y" {
+                    Write-Host "Proceeding with script..." -ForegroundColor Green
+                    $Confirmed = $true
+                }
+                "Q" {
+                    Write-Host "Exiting script. Goodbye!" -ForegroundColor Yellow
+                    exit
+                }
+                default {
+                    Write-Host "Invalid input. Please type 'Y' to continue or 'Q' to quit." -ForegroundColor Red
+                }
+            }
+        }
+        catch {
+            Write-Host "An error occurred: $_" -ForegroundColor Red
+        }
+    }
+
     $Cache = Get-RbacCache
 
     $CsvPath = "$env:USERPROFILE\Documents\EntraController\SubsAndRBAC\rbac.csv" 
