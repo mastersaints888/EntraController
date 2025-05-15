@@ -18,11 +18,11 @@ foreach ($Prop in $OnPremExtAttributes) {
     #Grab on prem extension attributes
     try {
         
-        $Values = Get-EntraUser -UserId $UserUPN -Property $Prop | Select-Object -ExpandProperty $Prop
+        $Values = Get-MgUser -UserId $UserUPN -Property $Prop | Select-Object -ExpandProperty $Prop
 
     }
     catch {
-        Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN, $Prop may not be applied"
+        Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN, $Prop may not be applied" $_.Exception.Message
         $Value = "N/A"
     }
 

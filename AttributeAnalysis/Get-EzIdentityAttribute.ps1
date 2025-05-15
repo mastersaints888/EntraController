@@ -34,7 +34,7 @@ $ArrayIDAttributes = @()
 foreach($Prop in $IdentityAttributeValues){
 
     #This is the value of the Property at the current iteration of the loop
-    $Values = Get-EntraUser -UserId $UserUPN -Property $Prop | Select-Object -ExpandProperty $Prop
+    $Values = Get-MgUser -UserId $UserUPN -Property $Prop | Select-Object -ExpandProperty $Prop
 
     #Check for Null and Write NA if Values are Null
     if($null -eq $Values){
@@ -49,7 +49,7 @@ foreach($Prop in $IdentityAttributeValues){
 
             #assigned License check need to expand more 
             if($Prop -eq "assignedLicenses"){
-            $Value = Get-EntraUser -UserId $UserUPN -Property assignedLicenses `
+            $Value = Get-MgUser -UserId $UserUPN -Property assignedLicenses `
         |   Select-Object -ExpandProperty assignedLicenses
             }
 

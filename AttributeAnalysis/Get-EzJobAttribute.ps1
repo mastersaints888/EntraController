@@ -1,8 +1,8 @@
 function Get-EzJobAttribute {
 # Ask user for the UPN
-$UserUPN = Read-Host "Please enter the UPN of the user in question to show its Entra Identity-based attributes"
+$UserUPN = Read-Host "Please enter the UPN of the user in question to show its Mg Identity-based attributes"
 
-# List of Entra Identity attributes to fetch
+# List of Mg Identity attributes to fetch
 $JobInfoAttributeValues = @(
     "sponsors",
     "manager",
@@ -26,21 +26,21 @@ foreach ($Prop in $JobInfoAttributeValues) {
     try {
         switch ($Prop) {
             "sponsors" {
-                $Sponsor = Get-EntraUserSponsor -UserId $UserUPN
+                $Sponsor = Get-MgUserSponsor -UserId $UserUPN
                 if ($Sponsor) {
-                    $SponsorDetails = Get-EntraUser -UserId $Sponsor.ID
+                    $SponsorDetails = Get-MgUser -UserId $Sponsor.ID
                     $Value = @($SponsorDetails.DisplayName, $SponsorDetails.UserPrincipalName, $SponsorDetails.Id)
                 }
             }
             "manager" {
-                $Manager = Get-EntraUserManager -UserId $UserUPN
+                $Manager = Get-MgUserManager -UserId $UserUPN
                 if ($Manager) {
-                    $ManagerDetails = Get-EntraUser -UserId $Manager.ID
+                    $ManagerDetails = Get-MgUser -UserId $Manager.ID
                     $Value = @($ManagerDetails.DisplayName, $ManagerDetails.UserPrincipalName, $ManagerDetails.Id)
                 }
             }
             default {
-                $Result = Get-EntraUser -UserId $UserUPN -Property $Prop
+                $Result = Get-MgUser -UserId $UserUPN -Property $Prop
                 $Value = $Result.$Prop
             }
         }

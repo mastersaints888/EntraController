@@ -27,7 +27,7 @@ foreach ($Prop in $OnPremAttributeValues) {
     try {
         switch ($Prop) {
             default {
-                $Result = Get-EntraUser -UserId $UserUPN -Property $Prop
+                $Result = Get-MgUser -UserId $UserUPN -Property $Prop
                 $Value = $Result.$Prop
             }
         }

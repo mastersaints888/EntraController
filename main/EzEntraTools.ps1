@@ -7,7 +7,8 @@ function Import-EzModuleDependencies {
         "Az.KeyVault",
         "Microsoft.Graph.Authentication", 
         "Microsoft.Graph.Groups",
-        "Microsoft.Graph.Users"
+        "Microsoft.Graph.Users",
+        "ImportExcel"
     )
 
     foreach ($Module in $ModuleDependencies) {
@@ -69,3 +70,4 @@ $BasePath = "$env:USERPROFILE\Documents\EntraController"
 # Users
 . "$BasePath\Users\New-EzBulkEntraUser.ps1"
 
+Import-EzModuleDependencies
