@@ -4,6 +4,42 @@ function New-EzBulkUser {
         [switch]$DryRun
     )
 
+
+    Write-Host -ForeGroundColor Yellow "Attempting to open user creation csv, please wait..."
+
+    Start-Process "$ENV:USERPROFILE\Documents\EntraController\Users\users.csv"
+
+    #set confirmation for breaking the loop if Y is selected
+$Confirmed = $false
+
+#user prompt
+    while (-not $Confirmed) {
+       
+        
+        try {
+
+            $P = Read-Host "Please build out your Bulk Users. When done, save the csv and exit. Type Y when finished (or type Q to quit)"
+
+            switch ($P.ToUpper()) {
+                "Y" {
+                    Write-Host "Proceeding with script..." -ForegroundColor Green
+                    $Confirmed = $true
+                }
+                "Q" {
+                    Write-Host "Exiting script. Goodbye!" -ForegroundColor Yellow
+                    return
+                }
+                default {
+                    Write-Host "Invalid input. Please type 'Y' to continue or 'Q' to quit." -ForegroundColor Red
+                }
+            }
+        }
+        catch {
+            Write-Host "An error occurred: $_" -ForegroundColor Red
+        }
+    }
+
+
     # Import users from CSV
     $Users = Import-Csv -Path "$ENV:USERPROFILE\Documents\EntraController\Users\users.csv"
 
