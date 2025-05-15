@@ -1,10 +1,10 @@
 
 function New-BulkDynamicGroup {
 
-Import-Module -Name ImportExcel
+#Import-Module -Name ImportExcel
 
 #open excel file for user to edit
-Start-Process "C:\Users\KielDavignonLab\Documents\EntraController\Groups\DynamicGroupDbExcel.xlsx"
+Start-Process "$env:USERPROFILE\Documents\EntraController\Groups\DynamicGroupDbExcel.xlsx"
 
 Write-Host -ForegroundColor Yellow "Attempting to open up excel Dynamic groups database..."
 
@@ -17,7 +17,7 @@ $Confirmed = $false
         
         try {
 
-            $P = Read-Host "Please build out your dynamic group queries and type Y when finished (or type Q to quit)"
+            $P = Read-Host "Please build out your dynamic group queries. When done, save the xslx and exit. Type Y when finished (or type Q to quit)"
 
             switch ($P.ToUpper()) {
                 "Y" {
