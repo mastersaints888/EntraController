@@ -1,5 +1,4 @@
-#Connect-MgGraph
-#Install-Module -Name ImportExcel
+
 function New-BulkDynamicGroup {
 
 Import-Module -Name ImportExcel

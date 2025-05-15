@@ -52,7 +52,7 @@ function swc {
     #Show current context only
 if ($show) {
     Write-Host -ForeGroundColor Green "Current Sub---->"(Get-AzContext).Name
-    exit
+    return
 } 
 
 
@@ -355,7 +355,7 @@ if($cleanview){  #Clean output view switch
 #show output on screen switch
 if ($Show){
     $Report 
-    exit
+    return
 }
 
 
@@ -381,7 +381,7 @@ do {
             $validResponse = $true
         }
         "N" {
-            exit
+            return
         }
         default {
             Write-Host "Invalid input. Please enter Y or N."

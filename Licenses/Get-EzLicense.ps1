@@ -1,12 +1,4 @@
 
-try {
-    #Import-Module -Name Microsoft.Graph
-    Connect-MgGraph -Scopes "Directory.Read.All"
-}
-catch {
-    Write-Host -ForegroundColor Green "Microsoft Graph is Loaded"
-}
-
 #region Get License
 function Get-EzLicense {
 param (
@@ -161,7 +153,7 @@ return $Options[$parsed - 1]
 
 }
 
-#Set-EzLicenseUserSelection
+
 
 
 #region Set License Group
@@ -278,9 +270,9 @@ catch {
     
 }
 
-#Set-EzLicenseGroup
 
 
 
-#Get-EzLicense | Select-Object ConsumedUnits, PrepaidUnits, FriendlyName
+
+
 

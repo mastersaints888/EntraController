@@ -71,6 +71,3 @@ $ArrayIDAttributes | Format-List
 
 }
 
-#Get-EzIdentityAttribute
-
-#Get-EntraUser -UserId "kdavignon@shclabtenant.onmicrosoft.com" -Property lastPasswordChangeDateTime | Select-Object -ExpandProperty lastPasswordChangeDateTime

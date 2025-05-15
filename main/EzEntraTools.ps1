@@ -1,11 +1,13 @@
-function Import-EzModules {
+function Import-EzModuleDependencies {
 
     $ModuleDependencies = @(
         #"Microsoft.Entra",
         "Az.Resources",
         "Az.Accounts",
+        "Az.KeyVault",
         "Microsoft.Graph.Authentication", 
-        "Microsoft.Graph.Groups"
+        "Microsoft.Graph.Groups",
+        "Microsoft.Graph.Users"
     )
 
     foreach ($Module in $ModuleDependencies) {
@@ -16,20 +18,8 @@ function Import-EzModules {
                 Write-Host "Installing missing module: $Module" -ForegroundColor Yellow
                 Install-Module -Name $Module -Force -AllowClobber -ErrorAction Stop
             }
-            else {
-                # Check if update is available
-                $latest = Find-Module -Name $Module
-                if ($installed.Version -lt $latest.Version) {
-                    Write-Host "Updating module: $Module ($($installed.Version) → $($latest.Version))" -ForegroundColor Cyan
-                    Update-Module -Name $Module -Force -ErrorAction Stop
-                }
-                else {
-                    Write-Host "Module $Module is up-to-date ($($installed.Version))" -ForegroundColor Green
-                }
-            }
-
-            Write-Host "Importing module: $Module" -ForegroundColor Green
-            Import-Module $Module -ErrorAction Stop
+                Write-Host "Importing module: $Module" -ForegroundColor Green
+                Import-Module $Module -ErrorAction Stop
         }
         catch {
             Write-Warning "An error occurred with module '$Module': $_"
@@ -37,17 +27,45 @@ function Import-EzModules {
     }
 
     try {
-        Write-Host "Connecting to Entra ID, Graph, and Az..." -ForegroundColor Green
+        Write-Host "Connecting to Graph, and Az..." -ForegroundColor Green
         #Connect-Entra -Scopes 'User.Read.All', 'Group.ReadWrite.All'
         Connect-MgGraph -Scope 'User.ReadWrite.All', 'Directory.Read.All', 'Group.ReadWrite.All'
-        Connect-AzAccount -UseDeviceAuthentication
+        Connect-AzAccount 
     }
     catch {
         Write-Warning "Error during service connections: $_"
     }
+
 }
 
 
-Import-EzModules 
 
+# Set base path
+$BasePath = "$env:USERPROFILE\Documents\EntraController"
+
+# Dot-source function scripts from each folder
+
+# AttributeAnalysis
+. "$BasePath\AttributeAnalysis\Get-EzAttributeBulk.ps1"
+. "$BasePath\AttributeAnalysis\Get-EzContactInfo.ps1"
+. "$BasePath\AttributeAnalysis\Get-EzIdentityAttribute.ps1"
+. "$BasePath\AttributeAnalysis\Get-EzJobAttribute.ps1"
+. "$BasePath\AttributeAnalysis\Get-EzOnPremAttribute.ps1"
+. "$BasePath\AttributeAnalysis\Get-EzOnPremExtAttribute.ps1"
+
+# Licenses
+. "$BasePath\Licenses\Get-EzLicense.ps1"
+
+# SubsAndRBAC
+. "$BasePath\SubsAndRBAC\Get-EzRbac.ps1"
+
+# KeyVault
+. "$BasePath\KeyVault\Set-EzKeyVaultSecret.ps1"
+
+# Groups
+. "$BasePath\Groups\New-BulkDynamicGroup.ps1"
+. "$BasePath\Groups\New-DynamicGroup.ps1"
+
+# Users
+. "$BasePath\Users\New-EzBulkEntraUser.ps1"
 

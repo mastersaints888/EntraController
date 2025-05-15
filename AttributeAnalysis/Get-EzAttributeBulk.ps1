@@ -18,12 +18,9 @@ function Get-EzContactInfoBulk {
     [CmdletBinding()]
     param (
         [switch]$ExportToCsv,
-        [string]$ExportPath = "$env:USERPROFILE\Documents\EzContactInfo.csv"
+        [string]$ExportPath = "$env:USERPROFILE\Downloads\EzContactInfo.csv"
     )
 
-    Import-Module -Name Microsoft.Entra -ErrorAction Stop
-    Connect-Entra
-    Connect-MgGraph -UseDeviceAuthentication
 
     function Get-EzContactInfoDetails {
         param (
@@ -108,9 +105,7 @@ function Get-EzIdentityAttributeBulk {
         [string]$ExportPath = "$env:USERPROFILE\Documents\EzContactInfo.csv"
     )
 
-    Import-Module -Name Microsoft.Entra -ErrorAction Stop
-    Connect-Entra
-    Connect-MgGraph -UseDeviceAuthentication 
+
 
 
 #func that provides each users attributes
