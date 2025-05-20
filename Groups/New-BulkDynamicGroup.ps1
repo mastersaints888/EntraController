@@ -40,12 +40,12 @@ $Confirmed = $false
 
 
 #convert the excel to a csv 
-Import-Excel -Path "C:\Users\KielDavignonLab\Documents\EntraController\Groups\DynamicGroupDbExcel.xlsx" | `
-Export-Csv -Path "C:\Users\KielDavignonLab\Documents\EntraController\Groups\DynamicGroupDb.csv" -NoTypeInformation
+Import-Excel -Path "$env:USERPROFILE\Documents\EntraController\Groups\DynamicGroupDbExcel.xlsx" | `
+Export-Csv -Path "$env:USERPROFILE\Documents\EntraController\Groups\DynamicGroupDb.csv" -NoTypeInformation
 #import users config
 
 
-$DGs = Import-Csv -Path "C:\Users\$env:USERNAME\Documents\EntraController\Groups\DynamicGroupDb.csv"
+$DGs = Import-Csv -Path "$env:USERPROFILE\Documents\EntraController\Groups\DynamicGroupDb.csv"
 
 #Display groups to user
 foreach($group in $DGs){
