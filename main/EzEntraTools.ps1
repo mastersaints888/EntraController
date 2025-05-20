@@ -66,9 +66,11 @@ $BasePath = "$env:USERPROFILE\Documents\EntraController"
 # Groups
 . "$BasePath\Groups\New-BulkDynamicGroup.ps1"
 . "$BasePath\Groups\New-DynamicGroup.ps1"
+. "$BasePath\Groups\New-EzGroups.ps1"
 
 # Users
 . "$BasePath\Users\New-EzBulkEntraUser.ps1"
+
 
 Import-EzModuleDependencies
 
@@ -133,10 +135,12 @@ function Start-EzEntraController {
             
             Write-Host "1) Create a dynamic group with logic"
             Write-Host "2) Design out bulk dynamic group infrastructure"
+            Write-Host "3) Create Bulk Basic Security Groups (Can be role assignable)"
             $UserSelection = Read-Host "Select an Option, press X to return to the main menu"
             switch($UserSelection){
                 "1" { New-EzDynamicGroup }
                 "2" { New-BulkDynamicGroup }
+                "3" { New-EzGroups }
                 "X" {$UserConfirm = $true}
             }
             
@@ -208,6 +212,30 @@ function Start-EzEntraController {
 
     }
 
+
+
+    function Start-EzGraphContext {
+
+        $UserConfirm = $false
+
+        while($UserConfirm -eq $false){
+            
+            Write-Host "1) Show Azure Sub (Az) Context"
+            Write-Host "2) Change Azure Sub (Az) Context - Change Subscription"
+            Write-Host "3) Show Microsoft Graph Context"
+            Write-Host "4) Change Microsoft Graph Context - Change Tenant"
+            $UserSelection = Read-Host "Select an Option, press X to return to the main menu"
+            switch($UserSelection){
+                "1" { swc -show }
+                "2" { swc }
+                "3" { con -mgc }
+                "4" { con -mgs }
+                "X" {$UserConfirm = $true}
+            }
+            
+        }
+
+    }
     
 
 while ($true) {
@@ -219,8 +247,7 @@ while ($true) {
     Write-Host "4) Licenses"
     Write-Host "5) Key Vault Management"
     Write-Host "6) RBAC Management"
-    Write-Host "7) Check your subscription context"
-    Write-Host "8) Switch your subscription context"
+    Write-Host "7) Check Azure and Graph Contexts"
     Write-Host "X) Exit"
     $choice = Read-Host "Select an option"
 
@@ -231,8 +258,7 @@ while ($true) {
         "4" { Start-EzLicenses }
         "5" { Start-EzKeyVaults }
         "6" { Start-EzRbac }
-        "7" { swc -show }
-        "8" { swc }
+        "7" { Start-EzGraphContext }
         "X" { exit }
         default { Write-Host "Invalid option, try again." }
     }

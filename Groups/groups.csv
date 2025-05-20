@@ -1,0 +1,4 @@
+﻿DisplayName,Description,IsAssignableToRole
+StandardBulkMailEnabled2,Bulkers1,FALSE
+StandardBulkRoleAssign2,Bulkers2,TRUE
+StandardBulkSecNoRole2,Bulkers3,FALSE

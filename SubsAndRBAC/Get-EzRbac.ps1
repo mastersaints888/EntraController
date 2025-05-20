@@ -105,6 +105,68 @@ if ($show) {
 }
 
 
+#region MgContext
+
+function con {
+
+    param (
+        [switch]$mgc,
+        [switch]$mgs
+    )
+  
+
+$UserContext = $null
+$UserContext = Get-MgContext 
+    
+if ($mgc){    
+    
+
+    $MgContextOut = @()
+
+    $MgContextOut = [PSCustomObject]@{
+        Account = $UserContext.Account
+        Tenant = $UserContext.TenantId
+    }
+
+    Write-Host -ForeGroundColor Yellow "Your Microsoft Graph Context is below, all calls will be against these contexts:"
+    $MgContextOut | Format-List
+}
+
+
+if($mgs){
+
+    $Confirmation = $false
+    
+    while($Confirmation -eq $false){    
+
+        write-host -ForegroundColor Green "Currently Logged in on:"$UserContext.Account
+        write-host -ForegroundColor Green "On Tennant:"$UserContext.TenantId
+        $Answer = read-host "Would you like to switch to another tenant or user account? (Y/N)"
+         
+        switch($Answer){
+            "Y" {
+                Disconnect-MgGraph -ErrorAction Ignore 
+                Connect-MgGraph 
+                $Confirmation = $true
+                return
+            }
+            "N" {
+                write-host "returning to menu"
+                $Confirmation = $true
+                return
+            }
+            default {
+                write-host "please type (Y/N)"
+            }
+          
+        } 
+
+    }
+
+}
+
+}
+
 
 
 
