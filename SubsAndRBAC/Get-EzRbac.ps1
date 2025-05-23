@@ -280,7 +280,7 @@ $Confirmed = $false
                 }
                 "Q" {
                     Write-Host "Exiting script. Goodbye!" -ForegroundColor Yellow
-                    exit
+                    return
                 }
                 default {
                     Write-Host "Invalid input. Please type 'Y' to continue or 'Q' to quit." -ForegroundColor Red

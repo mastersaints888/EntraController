@@ -131,7 +131,7 @@ while ($true) {
             Write-Host -ForegroundColor Yellow "Please input the key you wish to edit into the name field below or type in a new name to create a key"
             # call the set main function which is a function to create/set keys 
             set-main
-            exit
+            return
         }
         elseif ($answer -eq "N"){
             break

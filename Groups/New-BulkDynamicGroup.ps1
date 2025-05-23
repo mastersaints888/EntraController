@@ -44,8 +44,29 @@ Import-Excel -Path "$env:USERPROFILE\Documents\EntraController\Groups\DynamicGro
 Export-Csv -Path "$env:USERPROFILE\Documents\EntraController\Groups\DynamicGroupDb.csv" -NoTypeInformation
 #import users config
 
+#White Space Trimming 
 
-$DGs = Import-Csv -Path "$env:USERPROFILE\Documents\EntraController\Groups\DynamicGroupDb.csv"
+$CsvData = Import-Csv -Path "$env:USERPROFILE\Documents\EntraController\Groups\DynamicGroupDb.csv"
+
+function Trim-CsvContent {
+    param (
+        [Parameter(Mandatory)]
+        [array]$CsvData
+    )
+
+    foreach ($row in $CsvData) {
+        foreach ($prop in $row.PSObject.Properties) {
+            # Force value to string, then trim it
+            $stringValue = [string]::Copy($prop.Value)
+            $prop.Value = $stringValue.Trim()
+        }
+    }
+
+    return $CsvData
+}
+
+
+$DGs = Trim-CsvContent -CsvData $CsvData
 
 #Display groups to user
 foreach($group in $DGs){

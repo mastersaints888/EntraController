@@ -41,7 +41,7 @@ while (-not $Confirmed) {
                 }
                 "Q" {
                     Write-Host "Exiting script. Goodbye!" -ForegroundColor Yellow
-                    exit
+                    return
                 }
                 "C" {
                         foreach($group in $csv){
