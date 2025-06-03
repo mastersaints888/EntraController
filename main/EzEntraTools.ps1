@@ -8,7 +8,8 @@ function Import-EzModuleDependencies {
         "Microsoft.Graph.Authentication", 
         "Microsoft.Graph.Groups",
         "Microsoft.Graph.Users",
-        "ImportExcel"
+        "ImportExcel",
+        "Microsoft.Graph.Applications"
     )
 
     foreach ($Module in $ModuleDependencies) {
@@ -30,7 +31,7 @@ function Import-EzModuleDependencies {
     try {
         Write-Host "Connecting to Graph, and Az..." -ForegroundColor Green
         #Connect-Entra -Scopes 'User.Read.All', 'Group.ReadWrite.All'
-        Connect-MgGraph -Scope 'User.ReadWrite.All', 'Directory.Read.All', 'Group.ReadWrite.All'
+        Connect-MgGraph -Scope 'User.ReadWrite.All', 'Directory.Read.All', 'Group.ReadWrite.All', 'Application.ReadWrite.All'
         Connect-AzAccount 
     }
     catch {
@@ -70,6 +71,9 @@ $BasePath = "$env:USERPROFILE\Documents\EntraController"
 
 # Users
 . "$BasePath\Users\New-EzBulkEntraUser.ps1"
+
+#Service Principals
+. "$BasePath\ServicePrincipals\Set-EzGroupSp.ps1"
 
 
 Import-EzModuleDependencies
@@ -236,6 +240,26 @@ function Start-EzEntraController {
         }
 
     }
+
+
+
+    function Start-EzServicePrincipals {
+
+        $UserConfirm = $false
+
+        while($UserConfirm -eq $false){
+            
+            Write-Host "1) Add Groups to Enterprise applications"
+            $UserSelection = Read-Host "Select an Option, press X to return to the main menu"
+            switch($UserSelection){
+                "1" { Set-EzGroupSp }
+                "X" {$UserConfirm = $true}
+            }
+            
+        }
+
+    }
+
     
 
 while ($true) {
@@ -248,6 +272,7 @@ while ($true) {
     Write-Host "5) Key Vault Management"
     Write-Host "6) RBAC Management"
     Write-Host "7) Check Azure and Graph Contexts"
+    Write-Host "8) Service Principals and Apps"
     Write-Host "X) Exit"
     $choice = Read-Host "Select an option"
 
@@ -259,7 +284,8 @@ while ($true) {
         "5" { Start-EzKeyVaults }
         "6" { Start-EzRbac }
         "7" { Start-EzGraphContext }
-        "X" { exit }
+        "8" { Start-EzServicePrincipals }
+        "X" { return }
         default { Write-Host "Invalid option, try again." }
     }
     Pause

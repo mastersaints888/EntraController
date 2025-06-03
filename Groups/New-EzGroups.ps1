@@ -71,6 +71,7 @@ try {
     $MailNickName = $MailNickName.Trim()
     $IsAssignableToRole = [System.Convert]::ToBoolean($_.IsAssignableToRole.Trim())
     $MailEnabled = $false
+    $Description = $_.Description.Trim()
 
    
 
@@ -79,7 +80,8 @@ try {
     -MailEnabled:$MailEnabled `
     -MailNickName $MailNickName `
     -SecurityEnabled `
-    -IsAssignableToRole:$IsAssignableToRole
+    -IsAssignableToRole:$IsAssignableToRole `
+    -Description $Description
 
     Write-Host -ForeGroundColor Yellow "[CREATE] Creating group:" $_.DisplayName
 
