@@ -65,12 +65,10 @@ try {
 
     $csv | ForEach-Object {
 
-    $MailNickName = ($_.DisplayName) + (Get-Random -Minimum 1000 -Maximum 99999)
-
+    $MailNickName = ($_.MailNickname) + (Get-Random -Minimum 1000 -Maximum 99999)
     $DisplayName = $_.DisplayName.Trim()
-    $MailNickName = $MailNickName.Trim()
-    $IsAssignableToRole = [System.Convert]::ToBoolean($_.IsAssignableToRole.Trim())
     $MailEnabled = $false
+    $IsAssignableToRole = [System.Convert]::ToBoolean($_.IsAssignableToRole.Trim())
     $Description = $_.Description.Trim()
 
    

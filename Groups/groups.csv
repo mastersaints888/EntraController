@@ -1,4 +1,2 @@
-﻿DisplayName,Description,IsAssignableToRole
-StandardBulkMailEnabled2,Bulkers1,FALSE
-StandardBulkRoleAssign2,Bulkers2,TRUE
-StandardBulkSecNoRole2,Bulkers3,FALSE
+﻿DisplayName,Description,IsAssignableToRole,MailNickname
+Ugd-org:Test2,test adesfsd a453#$$#@,FALSE,nickname
