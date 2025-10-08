@@ -9,7 +9,8 @@ function Import-EzModuleDependencies {
         "Microsoft.Graph.Groups",
         "Microsoft.Graph.Users",
         "ImportExcel",
-        "Microsoft.Graph.Applications"
+        "Microsoft.Graph.Applications",
+        "Microsoft.Graph.Identity.DirectoryManagement"
     )
 
     foreach ($Module in $ModuleDependencies) {
