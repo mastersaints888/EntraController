@@ -25,8 +25,5 @@ Remove-Item $tempZip -Force
 Write-Host "Installation complete." -ForegroundColor Green
 
 # Optional: launch the tool
-$launchScript = Join-Path $installDir "Start-EzEntraLauncher.ps1"
-if (Test-Path $launchScript) {
-    Write-Host "Launching Ez Entra Tool..." -ForegroundColor Green
-    Start-Process "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$launchScript`""
-}
+Import-Module "$env:USERPROFILE\Documents\EntraController\EzEntraTools.psm1" -Force
+Start-EzEntraController
