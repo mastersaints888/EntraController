@@ -32,7 +32,7 @@ function Import-EzModuleDependencies {
     try {
         Write-Host "Connecting to Graph, and Az..." -ForegroundColor Green
         #Connect-Entra -Scopes 'User.Read.All', 'Group.ReadWrite.All'
-        Connect-MgGraph -Scope 'User.ReadWrite.All', 'Directory.Read.All', 'Group.ReadWrite.All', 'Application.ReadWrite.All'
+        Connect-MgGraph -Scope 'User.ReadWrite.All', 'Directory.ReadWrite.All', 'Group.ReadWrite.All', 'Application.ReadWrite.All'
         Connect-AzAccount 
     }
     catch {
