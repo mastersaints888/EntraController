@@ -22,7 +22,7 @@ Remove-Item $tempZip -Force
 Write-Host "Installation complete!" -ForegroundColor Green
 
 # Import the module so it’s ready
-Import-Module "$env:USERPROFILE\Documents\EntraController\EzEntraTools.psm1" -Force
+#Import-Module "$env:USERPROFILE\Documents\EntraController\EzEntraTools.psm1" -Force
 
 # Display usage info
 $Version = $PSVersionTable.PSVersion 
@@ -38,24 +38,63 @@ Write-Host ""
 $pwsh = Get-Command "pwsh.exe" -ErrorAction SilentlyContinue
 if ($pwsh) {
     Write-Host "PowerShell 7 is installed on this system." -ForegroundColor Green
-    Write-Host "You can launch it by hitting enter and typing in: pwsh" -ForegroundColor Cyan
+    Write-Host "You can launch it by typing in Y" -ForegroundColor Cyan
 } else {
     Write-Host "PowerShell 7 is NOT installed." -ForegroundColor Red
     Write-Host "Please install it from the following link:" -ForegroundColor Yellow
     Write-Host "https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows" -ForegroundColor Cyan
-    Write-Host "Then run " -ForegroundColor Yellow
+    Write-Host "Then type Y into the console" -ForegroundColor Yellow
 }
 Write-Host ""
 # ------------------------------------------------------------
 
-Write-Host "2.) In PowerShell 7, run this command:" -ForegroundColor Yellow
+Write-Host "1.) In PowerShell 7, run this command:" -ForegroundColor Yellow
 Write-Host "    Import-Module `$env:USERPROFILE\Documents\EntraController\EzEntraTools.psm1 -Force" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "3.) Start the tool run:" -ForegroundColor Yellow
+Write-Host "2.) Start the tool run:" -ForegroundColor Yellow
 Write-Host "    Start-EzEntraController" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "------------------------------------------------------------"
 Write-Host ""
 
-Write-Host "Press any key to exit..." -ForegroundColor Cyan
-pause
+
+$userInput = $false
+
+while  ($userInput -eq $false){
+
+    $userInput = Read-Host "Do you want to launch PowerShell 7 now? (Y/N)"
+
+
+    switch ( $userInput ) {
+        "Y" { 
+            
+            $InstallCheck = Test-Path "C:\Program Files\PowerShell\7\pwsh.exe"
+
+            if (-not $InstallCheck){
+
+                Write-Host "PowerShell 7 is NOT installed." -ForegroundColor Red
+                Write-Host "Please install it from the following link:" -ForegroundColor Yellow
+                Write-Host "https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows" -ForegroundColor Cyan
+                Write-Host "Then press Y " -ForegroundColor Yellow
+                $userInput = $false
+                continue
+
+            }else{ 
+                
+                Write-Host -ForegroundColor Green "Starting Powershell 7..."
+                Start-Process "C:\Program Files\PowerShell\7\pwsh.exe" 
+                $userInput = $true
+            
+            }
+
+
+            
+
+            $userInput = $true; exit}
+
+        "N" { Write-Host -ForegroundColor Yellow "Exiting script, please import module and run Start-EzEntraController in powershell 7"; break}
+        
+        Default { Write-Host "Please Type Y or N" 
+        $userInput = $false }
+    }
+}
