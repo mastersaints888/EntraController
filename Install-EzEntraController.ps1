@@ -5,7 +5,7 @@ $installDir = "$env:USERPROFILE\Documents\EntraController"
 $tempZip = Join-Path $env:TEMP "EntraController.zip"
 
 Write-Host "Downloading EntraController..." -ForegroundColor Cyan
-Invoke-WebRequest -Uri $repoUrl -OutFile $tempZip
+Invoke-WebRequest -Uri $repoUrl -OutFile $tempZip -UseBasicParsing
 
 Write-Host "Extracting..." -ForegroundColor Cyan
 Expand-Archive -Path $tempZip -DestinationPath $env:TEMP -Force
