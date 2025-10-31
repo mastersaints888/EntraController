@@ -76,6 +76,9 @@ $BasePath = "$env:USERPROFILE\Documents\EntraController"
 #Service Principals
 . "$BasePath\ServicePrincipals\Set-EzGroupSp.ps1"
 
+#Troubleshooting
+. "$BasePath\Troubleshooting\Update-EzEntraDependencies.ps1"
+
 
 Import-EzModuleDependencies
 
@@ -261,6 +264,25 @@ function Start-EzEntraController {
 
     }
 
+
+
+ function Start-EzTroubleshooting {
+
+        $UserConfirm = $false
+
+        while($UserConfirm -eq $false){
+            
+            Write-Host "1) Update Ez Entra Tools Module Dependencies"
+            $UserSelection = Read-Host "Select an Option, press X to return to the main menu"
+            switch($UserSelection){
+                "1" { Update-EzEntraDependencies }
+                "X" {$UserConfirm = $true}
+            }
+            
+        }
+
+    }
+
     
 
 while ($true) {
@@ -274,6 +296,7 @@ while ($true) {
     Write-Host "6) RBAC Management"
     Write-Host "7) Check Azure and Graph Contexts"
     Write-Host "8) Service Principals and Apps"
+    Write-Host "9) Troubleshooting"
     Write-Host "X) Exit"
     $choice = Read-Host "Select an option"
 
@@ -286,6 +309,7 @@ while ($true) {
         "6" { Start-EzRbac }
         "7" { Start-EzGraphContext }
         "8" { Start-EzServicePrincipals }
+        "9" { Start-EzTroubleshooting }
         "X" { return }
         default { Write-Host "Invalid option, try again." }
     }
