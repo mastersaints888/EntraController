@@ -1,6 +1,3 @@
-# Install-EntraController.ps1
-# Downloads EntraController from GitHub and installs it to Documents
-
 $ErrorActionPreference = "Stop"
 
 $repoUrl = "https://github.com/mastersaints888/EntraController/archive/refs/heads/main.zip"
@@ -22,14 +19,43 @@ Move-Item $extracted.FullName $installDir
 
 Remove-Item $tempZip -Force
 
-Write-Host "Installation complete." -ForegroundColor Green
+Write-Host "Installation complete!" -ForegroundColor Green
 
-# Optional: launch the tool
+# Import the module so it’s ready
 Import-Module "$env:USERPROFILE\Documents\EntraController\EzEntraTools.psm1" -Force
-#Tell the user how to start the tool
+
+# Display usage info
 $Version = $PSVersionTable.PSVersion 
 $DisplayVersion = $Version.Major, $Version.Minor -join '.'
-Write-Host "To start EntraController, make sure your on the right PSVersion YOU MUST BE ON POWERSHELL 7 or higher. Your verion is:" $DisplayVersion -ForegroundColor Yellow
-Write-Host "1.) If you are not on powershell 7, please open powershell 7 or download from https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.5" -ForegroundColor Yellow
-Write-Host "2.) Then run the following command in powershell 7 to import the tool: Import-Module $env:USERPROFILE\Documents\EntraController\EzEntraTools.psm1 -Force" -ForegroundColor Yellow
-Write-Host "3.) Then run the following command to start the tool: Start-EzEntraController" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "To start EntraController:" -ForegroundColor Yellow
+Write-Host "------------------------------------------------------------"
+Write-Host "• PowerShell version detected: $DisplayVersion"
+Write-Host "• You must use PowerShell 7 or higher."
+Write-Host ""
+
+# --- PowerShell 7 Check ---
+$pwsh = Get-Command "pwsh.exe" -ErrorAction SilentlyContinue
+if ($pwsh) {
+    Write-Host "PowerShell 7 is installed on this system." -ForegroundColor Green
+    Write-Host "You can launch it by hitting enter and typing in: pwsh" -ForegroundColor Cyan
+} else {
+    Write-Host "PowerShell 7 is NOT installed." -ForegroundColor Red
+    Write-Host "Please install it from the following link:" -ForegroundColor Yellow
+    Write-Host "https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows" -ForegroundColor Cyan
+    Write-Host "Then run " -ForegroundColor Yellow
+}
+Write-Host ""
+# ------------------------------------------------------------
+
+Write-Host "2.) In PowerShell 7, run this command:" -ForegroundColor Yellow
+Write-Host "    Import-Module `$env:USERPROFILE\Documents\EntraController\EzEntraTools.psm1 -Force" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "3.) Start the tool run:" -ForegroundColor Yellow
+Write-Host "    Start-EzEntraController" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "------------------------------------------------------------"
+Write-Host ""
+
+Write-Host "Press any key to exit..." -ForegroundColor Cyan
+pause
