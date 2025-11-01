@@ -24,13 +24,11 @@ Supports both EXE-based and direct PowerShell installation methods.
 ### Option 1: Install via EXE
 1. Download the latest release EXE from this repository’s **Releases** section.  
 2. Run the EXE **(not as Administrator)**.  
-3. Once installation completes, launch **PowerShell 7** and run:
-
-   ```powershell
+3. Once installation completes, launch **PowerShell 7** and run: 
+````
+```powershell
    Import-Module "$env:USERPROFILE\Documents\EntraController\EzEntraTools.psm1" -Force
    Start-EzEntraController
-````
-
 ---
 
 ### Option 2: Install Directly from PowerShell (Manual Method)
