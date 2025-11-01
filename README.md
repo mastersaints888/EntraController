@@ -1,6 +1,6 @@
 ### Ez Entra Controller
 -------------
-### Option 1: Install from EXE (Manual Method)
+### Option 1: Install from EXE (Automatic Method)
 ---
 
 ````markdown
