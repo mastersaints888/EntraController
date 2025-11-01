@@ -29,7 +29,8 @@ Supports both EXE-based and direct PowerShell installation methods.
 ```powershell
    Import-Module "$env:USERPROFILE\Documents\EntraController\EzEntraTools.psm1" -Force
    Start-EzEntraController
----
+````markdown
+----------------------
 
 ### Option 2: Install Directly from PowerShell (Manual Method)
 
