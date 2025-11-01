@@ -1,4 +1,4 @@
-###### Ez Entra Controller
+### Ez Entra Controller
 -------------
 ### Option 1: Install from EXE (Manual Method)
 ---
