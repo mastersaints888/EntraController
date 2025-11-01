@@ -95,7 +95,3 @@ If you encounter issues or have suggestions, please open an issue on the [GitHub
 
 ```
 
----
-
-Would you like me to include badges (like PowerShell version, license, or GitHub release badges) and a small logo/banner section at the top for a more “professional GitHub project” look?
-```
