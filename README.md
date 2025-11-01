@@ -91,7 +91,5 @@ This project is licensed under the [MIT License](LICENSE).
 
 If you encounter issues or have suggestions, please open an issue on the [GitHub Issues](../../issues) page.
 
----
 
-```
 
