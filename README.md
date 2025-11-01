@@ -1,4 +1,3 @@
-Here’s a clean, professional, and well-formatted **README.md** for your GitHub repository, written in Markdown with good sectioning and syntax highlighting for PowerShell code blocks:
 
 ---
 
