@@ -255,7 +255,8 @@ function Set-EzBulkRbac {
     [CmdletBinding()]
     param (
 
-        [switch]$DryRun
+        [switch]$DryRun,
+        [switch]$RemoveRoleAssignments
     )
 
     Write-Host -ForegroundColor Yellow "Attempting to open up excel Dynamic groups database..."
@@ -263,6 +264,7 @@ function Set-EzBulkRbac {
     Start-Process "$env:USERPROFILE\Documents\EntraController\SubsAndRBAC\rbac.csv"
 
     #set confirmation for breaking the loop if Y is selected
+ 
 $Confirmed = $false
 
 #user prompt
@@ -271,13 +273,14 @@ $Confirmed = $false
         
         try {
 
-            $P = Read-Host "Please build out your RBAC Framework, save the csv and exit the csv. type Y when finished (or type Q to quit)"
+            $P = Read-Host "Please build out your RBAC Framework, save the csv and exit the csv. type Y to continue this WILL NOT APPLY until you confirm on the next prompt (or type Q to quit)"
 
             switch ($P.ToUpper()) {
                 "Y" {
                     Write-Host "Proceeding with script..." -ForegroundColor Green
                     $Confirmed = $true
                 }
+        
                 "Q" {
                     Write-Host "Exiting script. Goodbye!" -ForegroundColor Yellow
                     return
@@ -291,7 +294,7 @@ $Confirmed = $false
             Write-Host "An error occurred: $_" -ForegroundColor Red
         }
     }
-
+   
     $Cache = Get-RbacCache
 
     $CsvPath = "$env:USERPROFILE\Documents\EntraController\SubsAndRBAC\rbac.csv" 
@@ -299,56 +302,131 @@ $Confirmed = $false
 
 
     $csv = Import-Csv -Path $CsvPath
-    foreach ($entry in $csv) {
-
-        $subName = $entry.SubscriptionName.ToLower()
-        $rgName = $entry.ResourceGroupName.ToLower()
-        $roleName = $entry.RoleName.ToLower()
-        $principalName = $entry.PrincipalName.ToLower()
-        $managementGroupName = $entry.managementGroupName.ToLower()
-
-        $subscriptionId = $Cache['Subscriptions'][$subName]
-        $resourceGroupKey = "$subscriptionId|$rgName"
-        $scope = $Cache['ResourceGroups'][$resourceGroupKey]
-        $roleId = $Cache['RoleDefinitions'][$roleName]
-        $principalId = $Cache['Principals'][$principalName]
 
 
-        #Pre command checks for sub level scope
-        if(-not $scope -and $subscriptionId){
-            $scope = "/subscriptions/$subscriptionId"
-        }
 
-        #pre commend check for MG level scope
-        if(-not $scope -and (-not $subscriptionId)){
-            $scope = $Cache['ManagementGroups'][$managementGroupName]
-        }
+$Confirmed = $false
+While (-not $Confirmed) {
 
-        if ($subscriptionId -or $managementGroupName -and $scope -and $roleId -and $principalId) {
-            if ($DryRun) {
-                if($subscriptionId){
-                Write-Host "[DRYRUN] Would assign '$roleName' to '$principalName' in scope '$scope' subname: '$subName'"
+
+    #Begin Switch for DryRun/Remove/Assign
+    $P = Read-Host "Please type 'Y' to apply 'C' to dry run 'R' to remove assignments or 'Q' to quit." 
+
+    switch ($P.ToUpper()){
+        
+        #Dry Run Switch 
+        "C" { 
+            
+            foreach ($entry in $csv){
+            
+            
+                if($entry.SubscriptionName){
+                Write-Host -ForeGroundColor Yellow "[DRYRUN] Would apply to '$($entry.RoleName)' to '$($entry.PrincipalName)' in scope subname: '$($entry.SubscriptionName)' with resource group: '$($entry.ResourceGroupName)'"
                 }
-                if($managementGroupName){
-                    Write-Host "[DRYRUN] Would assign '$roleName' to '$principalName' in scope '$scope' subname: '$managementGroupName'"
+                if($entry.ManagementGroupName){
+                    Write-Host -ForeGroundColor Yellow "[DRYRUN] would apply to '$($entry.RoleName)' to '$($entry.PrincipalName)' in scope '$scope' ManagementGroup: '$($entry.ManagementGroupName)'"
                 }
-            } else {
+            
+        }
+        #Break?   
+        } 
 
-                #Assigning the roles from spreadsheet 
+        #Remove Role Assignment Switch   
+        "R" {foreach ($entry in $csv){
+
+
+                    $subName = $entry.SubscriptionName.ToLower()
+                    $rgName = $entry.ResourceGroupName.ToLower()
+                    $roleName = $entry.RoleName.ToLower()
+                    $principalName = $entry.PrincipalName.ToLower()
+                    $managementGroupName = $entry.managementGroupName.ToLower()
+
+                    $subscriptionId = $Cache['Subscriptions'][$subName]
+                    $resourceGroupKey = "$subscriptionId|$rgName"
+                    $scope = $Cache['ResourceGroups'][$resourceGroupKey]
+                    $roleId = $Cache['RoleDefinitions'][$roleName]
+                    $principalId = $Cache['Principals'][$principalName]
+
+
+                    #Pre command checks for sub level scope
+                    if(-not $scope -and $subscriptionId){
+                                $scope = "/subscriptions/$subscriptionId"
+                    }
+
+                    #pre commend check for MG level scope
+                    if(-not $scope -and (-not $subscriptionId)){
+                        $scope = $Cache['ManagementGroups'][$managementGroupName]
+                    }
+
                 try {
-                New-AzRoleAssignment -ObjectId $principalId -RoleDefinitionId $roleId -Scope $scope
+                    Remove-AzRoleAssignment -ObjectId $principalId -RoleDefinitionId $roleId -Scope $scope -ErrorAction Stop
+                    Write-Host -ForeGroundColor Yellow "Removed '$roleName' from '$principalName' in scope '$scope'"
+                }catch
+                { 
+                    Write-Host "An error during the Role removal has occured $_.Exception"
+                }
+            }
+        $Confirmed = $true
+        } 
+        
+
+        #Assigning the roles from spreadsheet 
+        "Y" {
+
+                foreach ($entry in $csv) {
+
+                    $subName = $entry.SubscriptionName.ToLower()
+                    $rgName = $entry.ResourceGroupName.ToLower()
+                    $roleName = $entry.RoleName.ToLower()
+                    $principalName = $entry.PrincipalName.ToLower()
+                    $managementGroupName = $entry.managementGroupName.ToLower()
+
+                    $subscriptionId = $Cache['Subscriptions'][$subName]
+                    $resourceGroupKey = "$subscriptionId|$rgName"
+                    $scope = $Cache['ResourceGroups'][$resourceGroupKey]
+                    $roleId = $Cache['RoleDefinitions'][$roleName]
+                    $principalId = $Cache['Principals'][$principalName]
+
+
+                    #Pre command checks for sub level scope
+                    if(-not $scope -and $subscriptionId){
+                                $scope = "/subscriptions/$subscriptionId"
+                    }
+
+                    #pre commend check for MG level scope
+                    if(-not $scope -and (-not $subscriptionId)){
+                        $scope = $Cache['ManagementGroups'][$managementGroupName]
+                    }
+
+
+
+                try {
+                New-AzRoleAssignment -ObjectId $principalId -RoleDefinitionId $roleId -Scope $scope -ErrorAction Stop
                 Write-Host "Assigned '$roleName' to '$principalName' in scope '$scope'"
                 }catch
                 { Write-Host "An error during the Role assignment has occured $_.Exception"
                 }
-
+                if ($null -eq $scope -or $null -eq $roleId -or $null -eq $principalId) {
+                Write-Warning "Missing lookup: $($entry | ConvertTo-Json -Compress)"
+                }
             }
-        } else {
-            Write-Warning "Missing lookup: $($entry | ConvertTo-Json -Compress)"
-        }
-    }
 
+            
+        $Confirmed = $true
+        }
+        "Q" {
+                    Write-Host "Exiting script. Goodbye!" -ForegroundColor Yellow
+                    return
+                }
+        default {
+                    Write-Host "Invalid input. Please type 'Y' to apply 'C' to dry run 'R' to remove assignments or 'Q' to quit." -ForegroundColor Red
+                }
+    }
+} 
 }
+
+
+
 
 #Set-EzBulkRbac -DryRun
 

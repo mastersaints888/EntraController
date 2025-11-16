@@ -49,8 +49,9 @@ foreach($Prop in $IdentityAttributeValues){
 
             #assigned License check need to expand more 
             if($Prop -eq "assignedLicenses"){
-            $Value = Get-MgUser -UserId $UserUPN -Property assignedLicenses `
-        |   Select-Object -ExpandProperty assignedLicenses
+                $Value = @()
+                $Value += (Get-MgUserLicenseDetail -UserId $UserUPN).SkuPartNumber
+                
             }
 
             #Store key value pairs 
