@@ -526,12 +526,58 @@ if($cleanview){  #Clean output view switch
     }
 }
 
+
+# Add the additinal note property for inherited groups
+foreach ($Entry in $ReportOut) {
+    Add-Member -InputObject $Entry -NotePropertyName 'InheritedFromGroup' -NotePropertyValue $null -Force
+}
+
+
 #show output on screen switch
 if ($Show){
     $Report 
     return
 }
 
+
+    #Iterate through users inside groups and expand them out for the report
+    $ExpandedReport = @()
+    
+
+    foreach($Entry in $ReportOut){ 
+
+        #Check for group object
+        if ($Entry.ObjectType -eq 'Group'){
+
+            $GroupMembers = Get-MgGroupMemberAsUser -GroupId $Entry.ObjectId
+
+            foreach ($GroupMember in $GroupMembers){
+
+            $ExpandedReport += [PSCustomObject]@{
+                                    RoleAssignmentName = $Entry.RoleAssignmentName
+                                    RoleAssignmentId = $Entry.RoleAssignmentId
+                                    Scope = $Entry.Scope
+                                    DisplayName = $GroupMember.DisplayName
+                                    SignInName = $GroupMember.UserPrincipalName
+                                    RoleDefinitionName = $Entry.RoleDefinitionName
+                                    RoleDefinitionId = $Entry.RoleDefinitionId
+                                    ObjectId = $GroupMember.Id
+                                    ObjectType = 'User'
+                                    CanDelegate = $Entry.CanDelegate
+                                    Description = $Entry.Description
+                                    ConditionVersion = $Entry.ConditionVersion
+                                    Condition = $Entry.Condition
+                                    InheritedFromGroup = $Entry.DisplayName
+                                }
+            }
+
+
+        }
+
+
+    }
+
+    $ReportOut += $ExpandedReport
 
     $FileName = Read-Host "Please enter the name of your file, DO NOT include .csv"
 
