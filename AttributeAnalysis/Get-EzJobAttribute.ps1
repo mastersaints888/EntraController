@@ -26,22 +26,43 @@ foreach ($Prop in $JobInfoAttributeValues) {
     try {
         switch ($Prop) {
             "sponsors" {
-                $Sponsor = Get-MgUserSponsor -UserId $UserUPN
-                if ($Sponsor) {
-                    $SponsorDetails = Get-MgUser -UserId $Sponsor.ID
-                    $Value = @($SponsorDetails.DisplayName, $SponsorDetails.UserPrincipalName, $SponsorDetails.Id)
+                try{
+                    $Sponsor = Get-MgUserSponsor -UserId $UserUPN -ErrorAction Stop
+                    if ($Sponsor) {
+                        $SponsorDetails = Get-MgUser -UserId $Sponsor.ID
+                        $Value = @($SponsorDetails.DisplayName, $SponsorDetails.UserPrincipalName, $SponsorDetails.Id)
+                    }
+                }
+                catch{
+                    Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN : "
+                    Write-Host -ForegroundColor Red $_.Exception
                 }
             }
             "manager" {
-                $Manager = Get-MgUserManager -UserId $UserUPN
-                if ($Manager) {
+                
+                try {
+                    $Manager = Get-MgUserManager -UserId $UserUPN -ErrorAction Stop
+                    if ($Manager) {
                     $ManagerDetails = Get-MgUser -UserId $Manager.ID
                     $Value = @($ManagerDetails.DisplayName, $ManagerDetails.UserPrincipalName, $ManagerDetails.Id)
                 }
+                }
+                catch {
+                    Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN : "
+                    Write-Host -ForegroundColor Red $_.Exception
+                }
+                
             }
             default {
-                $Result = Get-MgUser -UserId $UserUPN -Property $Prop
-                $Value = $Result.$Prop
+                try {
+                    $Result = Get-MgUser -UserId $UserUPN -Property $Prop -ErrorAction Stop
+                    $Value = $Result.$Prop
+                }
+                catch {
+                    Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN : "
+                    Write-Host -ForegroundColor Red $_.Exception
+                }
+                
             }
         }
     }

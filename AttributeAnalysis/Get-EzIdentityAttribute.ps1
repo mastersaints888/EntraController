@@ -34,7 +34,14 @@ $ArrayIDAttributes = @()
 foreach($Prop in $IdentityAttributeValues){
 
     #This is the value of the Property at the current iteration of the loop
-    $Values = Get-MgUser -UserId $UserUPN -Property $Prop | Select-Object -ExpandProperty $Prop
+    try {
+        $Values = Get-MgUser -UserId $UserUPN -Property $Prop -ErrorAction Stop | Select-Object -ExpandProperty $Prop
+    }
+    catch {
+        Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN : "
+        Write-Host -ForegroundColor Red $_.Exception
+    }
+    
 
     #Check for Null and Write NA if Values are Null
     if($null -eq $Values){

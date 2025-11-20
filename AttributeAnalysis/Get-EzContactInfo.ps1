@@ -32,13 +32,14 @@ foreach ($Prop in $ContactInfoAttributes) {
     try {
         switch ($Prop) {
             default {
-                $Result = Get-MgUser -UserId $UserUPN -Property $Prop
+                $Result = Get-MgUser -UserId $UserUPN -Property $Prop -ErrorAction Stop
                 $Value = $Result.$Prop
             }
         }
     }
     catch {
-        Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN, $Prop may not be applied"
+        Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN : "
+        Write-Host -ForegroundColor Red $_.Exception
         $Value = "N/A"
     }
 
