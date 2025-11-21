@@ -8,7 +8,8 @@
 # You MUST already be logged in using Connect-MgGraph
 #Connect-MgGraph -Scopes "Application.Read.All"
 function Set-EzCloudExtensionAttribute {
-$ctx = Get-MgContext
+
+<#    $ctx = Get-MgContext
 
 $clientId = $ctx.ClientId
 $tenantId = $ctx.TenantId
@@ -19,7 +20,7 @@ $tokenResponse = Get-MsalToken -ClientId $clientId -TenantId $tenantId -Scopes $
 
 $accessToken = $tokenResponse.AccessToken
 
-
+#>
 
 
 
@@ -97,12 +98,13 @@ $SelectedCloudAttribute = Get-EzCloudAppExtentionOptions
 $CloudAttributeValue = Read-Host "Please put in the value of the cloud attribute $SelectedCloudAttribute "
 
 
-
+<#
 # Prepare headers
 $Headers = @{
     "Authorization" = "Bearer $accessToken"
     "Content-Type"  = "application/json"
 }
+#>
 
 # Prepare body
 $Body = @{ "$SelectedCloudAttribute" = "$CloudAttributeValue" } | ConvertTo-Json
@@ -152,12 +154,12 @@ while (-not $confirmed){
 
                 try {
 
-                    Write-Host -ForegroundColor Cyan "Attempting to apply [Attribute] '$SelectedCloudAttribute' with [Value] '$CloudAttributeValue' to User --- $($User.userPrincipalName)" 
+                    Write-Host -ForegroundColor Cyan "Applying [Attribute] '$SelectedCloudAttribute' with [Value] '$CloudAttributeValue' to User --- $($User.userPrincipalName)" 
                     # PATCH request
-                    Invoke-WebRequest -Uri "https://graph.microsoft.com/v1.0/users/$($User.userPrincipalName)" `
+                    Invoke-MgGraphRequest -Uri "https://graph.microsoft.com/v1.0/users/$($User.userPrincipalName)" `
                         -Method PATCH `
                         -Body $Body `
-                        -Headers $Headers `
+                        -ContentType "application/json" `
                         -ErrorAction Stop
                 }           
                 catch {
@@ -177,12 +179,12 @@ while (-not $confirmed){
                 
                 try {
                     $User = Get-MgUserByUserPrincipalName -UserPrincipalName $UserSelection -ErrorAction Stop
-                    Write-Host -ForegroundColor Cyan "Attempting to apply [Attribute] '$SelectedCloudAttribute' with [Value] '$CloudAttributeValue' to User --- $($UserSelection)" 
+                    Write-Host -ForegroundColor Cyan "Applying [Attribute] '$SelectedCloudAttribute' with [Value] '$CloudAttributeValue' to User --- $($UserSelection)" 
                     # PATCH request
-                    Invoke-WebRequest -Uri "https://graph.microsoft.com/v1.0/users/$($User.UserPrincipalName)" `
+                    Invoke-MgGraphRequest -Uri "https://graph.microsoft.com/v1.0/users/$($User.UserPrincipalName)" `
                         -Method PATCH `
                         -Body $Body `
-                        -Headers $Headers `
+                        -ContentType "application/json" `
                         -ErrorAction Stop
                 }           
                 catch {
