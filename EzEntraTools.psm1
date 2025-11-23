@@ -11,7 +11,6 @@ function Import-EzModuleDependencies {
         "ImportExcel",
         "Microsoft.Graph.Applications",
         "Microsoft.Graph.Identity.DirectoryManagement"
-        "MSAL.PS"
     )
 
     foreach ($Module in $ModuleDependencies) {
@@ -175,10 +174,12 @@ function Start-EzEntraController {
             
             Write-Host "1) Create bulk users"
             Write-Host "2) Set a new Cloud attribute a user or group of users"
+            Write-Host "3) Get Cloud directory extension attributes for a user"
             $UserSelection = Read-Host "Select an Option, press X to return to the main menu"
             switch($UserSelection){
                 "1" { New-EzBulkUser }
                 "2" { Set-EzCloudExtensionAttribute }
+                "3" { Get-EzCloudExtensionAttribute}
                 "X" {$UserConfirm = $true}
             }
             

@@ -4,30 +4,14 @@
 
 #Install-Module MSAL.PS -Force
 
-
+#region set cloud attribute
 # You MUST already be logged in using Connect-MgGraph
-#Connect-MgGraph -Scopes "Application.Read.All"
-function Set-EzCloudExtensionAttribute {
-
-<#    $ctx = Get-MgContext
-
-$clientId = $ctx.ClientId
-$tenantId = $ctx.TenantId
-$scopes   = $ctx.Scopes
-
-# Use MSAL to silently grab the same token Graph PowerShell is using
-$tokenResponse = Get-MsalToken -ClientId $clientId -TenantId $tenantId -Scopes $scopes 
-
-$accessToken = $tokenResponse.AccessToken
-
-#>
-
-
-
 # Get all applications
+
+#Retrieve all directory extension attributes that are tied to every cloud app
 function Get-EzCloudAppExtensionProperties {
 
-
+Write-Host "Retrieving Directory Extensions this may take a moment..." -ForegroundColor Green
 
 $apps = Get-MgApplication -All
 
@@ -52,6 +36,11 @@ $results = foreach ($app in $apps) {
 return $results 
 
 }
+
+#Connect-MgGraph -Scopes "Application.Read.All"
+function Set-EzCloudExtensionAttribute {
+
+
 
 function Get-EzCloudAppExtentionOptions {
 
@@ -98,18 +87,8 @@ $SelectedCloudAttribute = Get-EzCloudAppExtentionOptions
 $CloudAttributeValue = Read-Host "Please put in the value of the cloud attribute $SelectedCloudAttribute "
 
 
-<#
-# Prepare headers
-$Headers = @{
-    "Authorization" = "Bearer $accessToken"
-    "Content-Type"  = "application/json"
-}
-#>
-
 # Prepare body
 $Body = @{ "$SelectedCloudAttribute" = "$CloudAttributeValue" } | ConvertTo-Json
-
-
 
 
 
@@ -132,6 +111,38 @@ while (-not $confirmed){
                 $Group = Get-MgGroup -Filter "displayName eq '$($GroupSelection)'" -ErrorAction Stop
                 $Users = $null
                 $Users = Get-MgGroupMemberAsUser -GroupId $Group.Id -ErrorAction Stop | Select-Object userPrincipalName
+
+                #ask user to confirm the selection
+                $ConfirmAttributeApply = $false
+                While (-not $ConfirmAttributeApply){
+
+                    $UserConfirmAttributeApply = Read-Host "Press C to [DryRun] or press Y to apply, N to Cancel" 
+                    switch($UserConfirmAttributeApply){
+
+                        "C" {
+                            Write-Host -ForegroundColor Yellow "[DRY RUN] You are about to apply [Attribute] '$SelectedCloudAttribute' with [Value] '$CloudAttributeValue' to the following users: "
+                                foreach ($User in $Users){
+
+                                    Write-Host -ForegroundColor Yellow "[DRY RUN] You are about to apply [Attribute] '$SelectedCloudAttribute' with [Value] '$CloudAttributeValue' to [USER] --- $($User.UserPrincipalName)"
+
+                                }
+                                $ConfirmAttributeApply = $false
+                            }
+                        "Y" { Write-Host -ForegroundColor Yellow " Proceeding with application..." 
+                            $ConfirmAttributeApply = $true 
+                        }
+                        "N" { 
+                            Write-Host -ForegroundColor Yellow "Exiting script... goodbye!"
+                            $ConfirmAttributeApply = $true
+                            $confirmed = $true 
+                            break 
+                        }
+                        default { 
+                            Write-Host "Invalid input... Please choose Y to proceed or C to Dry run" 
+                        }
+                    }
+                }
+
             }
             catch {
                 Write-Host -ForegroundColor Red "An error has occured $($_.Exception.Message)"
@@ -148,7 +159,12 @@ while (-not $confirmed){
 
             }
             
+            #break the loop if user selects N for the confirmation 
+            if ($UserConfirmAttributeApply -eq "N"){
 
+                break
+
+            }
             #Loop thru each user and apply the extension attribute
             foreach($User in $Users){
 
@@ -163,7 +179,7 @@ while (-not $confirmed){
                         -ErrorAction Stop
                 }           
                 catch {
-                    Write-Host "-Error applying to User $($User.userPrincipalName) : $_" -ForegroundColor Red
+                    Write-Host "-Error applying to User $($User.userPrincipalName) : $($_.Exception.Message)" -ForegroundColor Red
                     }
 
                 }
@@ -206,3 +222,59 @@ while (-not $confirmed){
 
 }
 
+
+#end region
+
+
+
+
+#region Get cloud attribute
+function Get-EzCloudExtensionAttribute {
+
+    $AllExtensionAttributes = Get-EzCloudAppExtensionProperties
+
+
+
+    $UserSelection = Read-Host "Please input the UPN of the user you would like to get cloud extension attributes for "
+
+
+    try {
+        $User = Get-MgUserByUserPrincipalName -UserPrincipalName $UserSelection -ErrorAction Stop
+    }
+    catch {
+        Write-Host "-Error retrieving User $($UserSelection) : $($_.Exception.Message)" -ForegroundColor Red
+    return
+    }
+        
+                    #Write-Host -ForegroundColor Cyan "Applying [Attribute] '$SelectedCloudAttribute' with [Value] '$CloudAttributeValue' to User --- $($UserSelection)" 
+                    # PATCH request
+                $UserCloudExtensionsOutput = @()
+
+                foreach ($ExtAttr in $AllExtensionAttributes.ExtensionName){
+                    
+                    #clean up each attribute name for the select statement
+                    try{
+
+                    $response = Invoke-MgGraphRequest -Uri "https://graph.microsoft.com/v1.0/users/$($User.UserPrincipalName)?`$select=$($ExtAttr)" `
+                        -Method GET `
+                        -ContentType "application/json" `
+                        -ErrorAction Stop
+
+                    Write-Output "$($ExtAttr) ---> $($response.$ExtAttr)"
+                    #May use in future but output having trouble returning values sadly 
+                    <#
+                    $UserCloudExtensionsOutput += [PSCustomObject]@{
+                        AttributeName = $ExtAttr
+                        AttributeValue = $response.$ExtAttr
+                    }
+                        #>
+                    
+                }
+                catch {
+                    Write-Host "-Error retrieving attribute $($ExtAttr) for User $($User.UserPrincipalName) : $($_.Exception.Message)" -ForegroundColor Red
+                    }
+                }
+
+}
+
+                    
