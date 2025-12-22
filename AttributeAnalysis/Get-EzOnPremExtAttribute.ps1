@@ -1,7 +1,30 @@
 function Get-EzOnPremExtAttribute {
 
+param (
+
+    [switch]$ActionType,
+    [string]$UserUPN
+
+)
+
+#for single user attribute retrieval
+switch($ActionType){
+
+        $true { 
+        
+            # Ask user for the UPN
+            $UserUPN = Read-Host "Please enter the UPN of the user in question to show its on prem stored attributes in Entra"
+        
+        }
+        "default" {
+        
+            continue
+        
+        }
+
+}
 # Ask user for the UPN
-$UserUPN = Read-Host "Please enter the UPN of the user in question to show its on prem stored attributes in Entra"
+#$UserUPN = Read-Host "Please enter the UPN of the user in question to show its on prem stored attributes in Entra"
 
 # List of Entra Identity attributes to fetch
 $OnPremExtAttributes = @(
@@ -37,28 +60,39 @@ foreach ($Prop in $OnPremExtAttributes) {
     $ArrayOnPremExtAttributes += $ExtensionAttributes   
 }
 
+$OutputOnPremAttributes = @()
+
 #Formatting for pretty output
 foreach($Attribute in $Values){
-    $ArrayOnPremExtAttributes += [PSCustomObject]@{
-    extensionAttribute1  = $Value.extensionAttribute1
-    extensionAttribute2  = $Value.extensionAttribute2
-    extensionAttribute3  = $Value.extensionAttribute3
-    extensionAttribute4  = $Value.extensionAttribute4
-    extensionAttribute5  = $Value.extensionAttribute5
-    extensionAttribute6  = $Value.extensionAttribute6
-    extensionAttribute7  = $Value.extensionAttribute7
-    extensionAttribute8  = $Value.extensionAttribute8
-    extensionAttribute9  = $Value.extensionAttribute9
-    extensionAttribute10 = $Value.extensionAttribute10
-    extensionAttribute11 = $Value.extensionAttribute11
-    extensionAttribute12 = $Value.extensionAttribute12
-    extensionAttribute13 = $Value.extensionAttribute13
-    extensionAttribute14 = $Value.extensionAttribute14
-    extensionAttribute15 = $Value.extensionAttribute15
+    $OutputOnPremAttributes += [PSCustomObject]@{
+    extensionAttribute1  = $Attribute.extensionAttribute1
+    extensionAttribute2  = $Attribute.extensionAttribute2
+    extensionAttribute3  = $Attribute.extensionAttribute3
+    extensionAttribute4  = $Attribute.extensionAttribute4
+    extensionAttribute5  = $Attribute.extensionAttribute5
+    extensionAttribute6  = $Attribute.extensionAttribute6
+    extensionAttribute7  = $Attribute.extensionAttribute7
+    extensionAttribute8  = $Attribute.extensionAttribute8
+    extensionAttribute9  = $Attribute.extensionAttribute9
+    extensionAttribute10 = $Attribute.extensionAttribute10
+    extensionAttribute11 = $Attribute.extensionAttribute11
+    extensionAttribute12 = $Attribute.extensionAttribute12
+    extensionAttribute13 = $Attribute.extensionAttribute13
+    extensionAttribute14 = $Attribute.extensionAttribute14
+    extensionAttribute15 = $Attribute.extensionAttribute15
     }
 
 }
 
-$ArrayOnPremExtAttributes | Format-List
+if ($ActionType -eq $true) {
+
+    Write-Host -ForegroundColor Cyan "Here are the on prem stored attributes for $UserUPN :"
+    $OutputOnPremAttributes | Format-List 
+
+} else {
+
+ return $OutputOnPremAttributes
+}
 
 }
+
