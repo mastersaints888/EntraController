@@ -13,7 +13,19 @@ function Get-EzCloudAppExtensionProperties {
 
 Write-Host "Retrieving Directory Extensions this may take a moment..." -ForegroundColor Green
 
-$apps = Get-MgApplication -All
+
+#Check if the extension attributes were enabled 
+
+    $apps = Get-MgApplication -Filter "displayName eq 'Tenant Schema Extension App'" -ErrorAction Stop
+
+    if($null -eq $apps){
+    
+        Write-Host "Tenant directory extensions may not be enabled in AAD. Please enable it in the Entra Connect." -ForegroundColor Red
+        Write-Host "you can find documentation on how to enable this here: https://learn.microsoft.com/en-us/azure/active-directory/hybrid/how-to-connect-configure-tenant-schema-extensions" -ForegroundColor Yellow
+    
+    }
+
+
 
 # Collect extension properties for each app
 $results = foreach ($app in $apps) {

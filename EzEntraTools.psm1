@@ -117,12 +117,14 @@ function Start-EzEntraController {
         $UserConfirm = $false
 
         while($UserConfirm -eq $false){
-            
+
+            Write-Host "--------- Single Actions ---------"
             Write-Host "1) Get Entra Job Attributes - (JobTile, CompanyName etc...)"
             Write-Host "2) Get Entra Identity Attributes - (UPN, PasswordLastset, UserType etc...)"
             Write-Host "3) Get Entra Contact Info Attributes - (Address, PhoneNumber etc...)"
             Write-Host "4) Get OnPrem Attributes - (SyncStatus, Immutable Ids etc...)"
             Write-Host "5) Get OnPrem Extension Attributes - (ExtensionAttribute 1, 2, 3 etc...)"
+            Write-Host "--------- Bulk Actions -----------"
             Write-Host "6) Get Entra Bulk OnPrem Extension Attributes - (Extension Attribute 1, 2, 3 etc...)"
             $UserSelection = Read-Host "Select an Option, press X to return to the main menu"
             switch($UserSelection){
@@ -297,11 +299,18 @@ function Start-EzEntraController {
 
     }
 
-    
+$Banner = @'                                                                                                                                                      
+  _____       _                ____            _             _ _           
+ | ____|_ __ | |_ _ __ __ _   / ___|___  _ __ | |_ _ __ ___ | | | ___ _ __ 
+ |  _| | '_ \| __| '__/ _` | | |   / _ \| '_ \| __| '__/ _ \| | |/ _ \ '__|
+ | |___| | | | |_| | | (_| | | |__| (_) | | | | |_| | | (_) | | |  __/ |   
+ |_____|_| |_|\__|_|  \__,_|  \____\___/|_| |_|\__|_|  \___/|_|_|\___|_|   
+                        ---- By Kiel Davignon ----
+'@ 
 
 while ($true) {
     Clear-Host
-    Write-Host "===== Entra Controller ====="
+    Write-Host $Banner -ForegroundColor Cyan 
     Write-Host "1) User Attributes"
     Write-Host "2) Users"
     Write-Host "3) Groups"
