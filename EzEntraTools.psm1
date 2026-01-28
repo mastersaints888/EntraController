@@ -11,6 +11,7 @@ function Import-EzModuleDependencies {
         "ImportExcel",
         "Microsoft.Graph.Applications",
         "Microsoft.Graph.Identity.DirectoryManagement"
+        "Microsoft.Graph.Identity.Governance"
     )
 
     foreach ($Module in $ModuleDependencies) {
@@ -32,7 +33,7 @@ function Import-EzModuleDependencies {
     try {
         Write-Host "Connecting to Graph, and Az..." -ForegroundColor Green
         #Connect-Entra -Scopes 'User.Read.All', 'Group.ReadWrite.All'
-        Connect-MgGraph -Scope 'User.ReadWrite.All', 'Directory.ReadWrite.All', 'Group.ReadWrite.All', 'Application.ReadWrite.All'
+        Connect-MgGraph -Scope 'User.ReadWrite.All', 'Directory.ReadWrite.All', 'Group.ReadWrite.All', 'Application.ReadWrite.All', 'EntitlementManagement.ReadWrite.All'
         Connect-AzAccount 
     }
     catch {
@@ -82,6 +83,9 @@ $BasePath = "$env:USERPROFILE\Documents\EntraController"
 
 #Troubleshooting
 . "$BasePath\Troubleshooting\Update-EzEntraDependencies.ps1"
+
+#Access Packages
+. "$BasePath\AccessPackages\New-EZBulkAccessPackageSecurityGroupAssignment.ps1" 
 
 
 Import-EzModuleDependencies
@@ -280,7 +284,22 @@ function Start-EzEntraController {
 
     }
 
+function Start-EzAccessPackages {
 
+        $UserConfirm = $false
+
+        while($UserConfirm -eq $false){
+            
+            Write-Host "1) Add Bulk Group Resources to a Catalog and and Access Package"
+            $UserSelection = Read-Host "Select an Option, press X to return to the main menu"
+            switch($UserSelection){
+                "1" { New-EZBulkAccessPackageSecurityGroupAssignment }
+                "X" {$UserConfirm = $true}
+            }
+            
+        }
+
+}
 
  function Start-EzTroubleshooting {
 
@@ -319,7 +338,8 @@ while ($true) {
     Write-Host "6) RBAC Management"
     Write-Host "7) Check Azure and Graph Contexts"
     Write-Host "8) Service Principals and Apps"
-    Write-Host "9) Troubleshooting"
+    Write-Host "9) Access Packages" 
+    Write-Host "10)Troubleshooting"
     Write-Host "X) Exit"
     $choice = Read-Host "Select an option"
 
@@ -332,7 +352,8 @@ while ($true) {
         "6" { Start-EzRbac }
         "7" { Start-EzGraphContext }
         "8" { Start-EzServicePrincipals }
-        "9" { Start-EzTroubleshooting }
+        "9" {Start-EzAccessPackages}
+        "10" { Start-EzTroubleshooting }
         "X" { return }
         default { Write-Host "Invalid option, try again." }
     }
