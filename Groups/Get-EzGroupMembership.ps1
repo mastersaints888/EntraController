@@ -71,6 +71,9 @@ foreach ($Group in $userGroupGet) {
         
         foreach ($groupMember in $groupMembers){  
 
+        #grab users companyName
+        $CompanyName = Get-MgUser -UserId $groupMember.Id -Property CompanyName | Select-Object CompanyName
+
         $UserToGroupMappings += [PSCustomObject]@{
                                 GroupID = $groupId
                                 Group = $groupName.DisplayName
@@ -79,6 +82,7 @@ foreach ($Group in $userGroupGet) {
                                 JobTitle = $groupMember.JobTitle
                                 OnPrem = $OnPrem
                                 GroupType = foreach ($Type in $GroupType){ $Type -join ","}
+                                UserCompanyName = $CompanyName.CompanyName
                             }
         }
     
