@@ -49,9 +49,15 @@ foreach ($Group in $userGroupGet) {
     
     # Retrieve group Id of each group
     try {
- 
+        
     $groupName = Get-MgGroup -Filter "displayName eq '$($Group.groupName.Trim())'" -ErrorAction Stop
     $groupId = $groupName.Id
+    # Set if dynamic group
+    $GroupType = $groupName.GroupTypes
+    # if on prem group set to true if cloud false 
+    $OnPrem = $groupName.OnPremisesSyncEnabled
+        if($OnPrem -ne $true){
+            $OnPrem = $false }
 
     #retrieve users in the group
     $groupMembers = Get-MgGroupMemberAsUser -GroupId $groupId -ErrorAction Stop
@@ -63,13 +69,16 @@ foreach ($Group in $userGroupGet) {
     }
     # generate report 
         
-        foreach ($groupMember in $groupMembers){
-    
+        foreach ($groupMember in $groupMembers){  
+
         $UserToGroupMappings += [PSCustomObject]@{
                                 GroupID = $groupId
                                 Group = $groupName.DisplayName
                                 UPN = $groupMember.UserPrincipalName
                                 DisplayName = $groupMember.DisplayName
+                                JobTitle = $groupMember.JobTitle
+                                OnPrem = $OnPrem
+                                GroupType = foreach ($Type in $GroupType){ $Type -join ","}
                             }
         }
     
