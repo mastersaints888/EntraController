@@ -73,6 +73,7 @@ $BasePath = "$env:USERPROFILE\Documents\EntraController"
 . "$BasePath\Groups\New-EzGroups.ps1"
 . "$BasePath\Groups\New-EzGroupMembership.ps1"
 . "$BasePath\Groups\Get-EzGroupMembership.ps1"
+. "$BasePath\Groups\Get-EzUserMemberOfGroups.ps1"
 
 # Users
 . "$BasePath\Users\New-EzBulkEntraUser.ps1"
@@ -152,12 +153,13 @@ function Start-EzEntraController {
         $UserConfirm = $false
 
         while($UserConfirm -eq $false){
-            
+            Write-Host "--------- Group Management Actions ---------"
             Write-Host "1) Create a dynamic group with logic"
             Write-Host "2) Design out bulk dynamic group infrastructure"
             Write-Host "3) Create Bulk Basic Security Groups (Can be role assignable)"
             Write-Host "4) Add Users to Groups in Bulk - single group or multiple groups"
             Write-Host "5) Get user memberships of multiple groups in bulk"
+            Write-Host "6) Get all groups many users are a member of"
             $UserSelection = Read-Host "Select an Option, press X to return to the main menu"
             switch($UserSelection){
                 "1" { New-EzDynamicGroup }
@@ -165,6 +167,7 @@ function Start-EzEntraController {
                 "3" { New-EzGroups }
                 "4" { New-EzGroupMembership }
                 "5" { Get-EzGroupMembership }
+                "6" { Get-EzUserMemberOfGroups }
                 "X" {$UserConfirm = $true}
             }
             
