@@ -86,7 +86,8 @@ $BasePath = "$env:USERPROFILE\Documents\EntraController"
 . "$BasePath\Troubleshooting\Update-EzEntraDependencies.ps1"
 
 #Access Packages
-. "$BasePath\AccessPackages\New-EZBulkAccessPackageSecurityGroupAssignment.ps1" 
+. "$BasePath\AccessPackages\New-EZBulkAccessPackageSecurityGroupAssignment.ps1"
+. "$BasePath\AccessPackages\New-EzAccessPackages.ps1"
 
 
 Import-EzModuleDependencies
@@ -294,9 +295,11 @@ function Start-EzAccessPackages {
         while($UserConfirm -eq $false){
             
             Write-Host "1) Add Bulk Group Resources to a Catalog and and Access Package"
+            Write-Host "2) Create and Access Packages (Bulk or Single)"
             $UserSelection = Read-Host "Select an Option, press X to return to the main menu"
             switch($UserSelection){
                 "1" { New-EZBulkAccessPackageSecurityGroupAssignment }
+                "2" { New-EzAccessPackages }
                 "X" {$UserConfirm = $true}
             }
             
