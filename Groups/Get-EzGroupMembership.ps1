@@ -60,7 +60,7 @@ foreach ($Group in $userGroupGet) {
             $OnPrem = $false }
 
     #retrieve users in the group
-    $groupMembers = Get-MgGroupMemberAsUser -GroupId $groupId -ErrorAction Stop
+    $groupMembers = Get-MgGroupMemberAsUser -All -GroupId $groupId -ErrorAction Stop
     
     }
     catch {
