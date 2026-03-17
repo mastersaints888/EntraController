@@ -495,6 +495,10 @@ While ($true){
         $SubscriptionName = Get-UserSelection -Options $SubCache.Keys
         $SubscriptionId = $SubCache["$SubscriptionName"]
         $Report = Get-AzRoleAssignment -Scope "/subscriptions/$SubscriptionId"
+            foreach($Entry in $Report){
+                Add-Member -InputObject $Entry -NotePropertyName 'SubscriptionName' -NotePropertyValue $SubscriptionName -Force
+            }
+
     }
     "ManagementGroup" { 
         $MgGroupName = Get-UserSelection -Options $MgCache.Keys
@@ -505,11 +509,16 @@ While ($true){
         $Report = @()
         foreach($sub in $SubCache.Values){
             $Report += Get-AzRoleAssignment -Scope "/subscriptions/$sub"
+            $SubscriptionName = ($SubCache.GetEnumerator() | Where-Object { $_.Value -eq $sub }).Key
+            foreach($Entry in $Report){
+                if($Entry.Scope -like "/subscriptions/$sub*"){
+                Add-Member -InputObject $Entry -NotePropertyName 'SubscriptionName' -NotePropertyValue $SubscriptionName -Force
+            }
         }
     }
 }
-
-$ReportOut = $Report
+}
+$ReportOut = $Report 
 
 if($cleanview){  #Clean output view switch 
     $ReportOut = @()
@@ -549,11 +558,18 @@ if ($Show){
         #Check for group object
         if ($Entry.ObjectType -eq 'Group'){
 
-            $GroupMembers = Get-MgGroupMemberAsUser -GroupId $Entry.ObjectId
-
+            try{
+            $GroupMembers = Get-MgGroupMemberAsUser -GroupId $Entry.ObjectId -ErrorAction Stop
+            }
+            catch{
+                Write-Host "An error occured while expanding group members for group '$($Entry.DisplayName)'. Error: $_.Exception.Message" -ForegroundColor Red
+                continue
+            }
+            
             foreach ($GroupMember in $GroupMembers){
-
+            
             $ExpandedReport += [PSCustomObject]@{
+                                    SubscriptionName = $Entry.SubscriptionName
                                     RoleAssignmentName = $Entry.RoleAssignmentName
                                     RoleAssignmentId = $Entry.RoleAssignmentId
                                     Scope = $Entry.Scope
