@@ -1,89 +1,182 @@
 function Get-EzJobAttribute {
-# Ask user for the UPN
-$UserUPN = Read-Host "Please enter the UPN of the user in question to show its Mg Identity-based attributes"
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [string]$UserUPN,
 
-# List of Mg Identity attributes to fetch
-$JobInfoAttributeValues = @(
-    "sponsors",
-    "manager",
-    "jobTitle",
-    "companyName",
-    "department",
-    "employeeId",
-    "employeeType",
-    "employeeHireDate",
-    "employeeOrgData",
-    "officeLocation"
-)
+        [Parameter()]
+        [switch]$BulkGroup,
 
-# Initialize output array
-$ArrayJobAttributes = @()
+        [Parameter()]
+        [switch]$SingleUser
+    )
 
-# Loop through each attribute
-foreach ($Prop in $JobInfoAttributeValues) {
-    $Value = $null
+    # List of Mg Identity attributes to fetch
+    $JobInfoAttributeValues = @(
+        "userPrincipalName",
+        "sponsors",
+        "manager",
+        "jobTitle",
+        "companyName",
+        "department",
+        "employeeId",
+        "employeeType",
+        "employeeHireDate",
+        "employeeOrgData",
+        "officeLocation"
+    )
 
-    try {
-        switch ($Prop) {
-            "sponsors" {
-                try{
-                    $Sponsor = Get-MgUserSponsor -UserId $UserUPN -ErrorAction Stop
-                    if ($Sponsor) {
-                        $SponsorDetails = Get-MgUser -UserId $Sponsor.ID
-                        $Value = @($SponsorDetails.DisplayName, $SponsorDetails.UserPrincipalName, $SponsorDetails.Id)
+    # Initialize output array
+    $ArrayJobAttributes = @()
+
+    switch ($BulkGroup) {
+
+        $true {
+            foreach ($Prop in $JobInfoAttributeValues) {
+                $Value = $null
+
+                try {
+                    switch ($Prop) {
+                        "sponsors" {
+                            try {
+                                $Sponsor = Get-MgUserSponsor -UserId $UserUPN -ErrorAction Stop
+                                if ($Sponsor) {
+                                    $SponsorDetails = Get-MgUser -UserId $Sponsor.ID
+                                    $Value = @($SponsorDetails.DisplayName, $SponsorDetails.UserPrincipalName, $SponsorDetails.Id)
+                                }
+                            }
+                            catch {
+                                Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN : "
+                                Write-Host -ForegroundColor Red $_.Exception
+                            }
+                        }
+                        "manager" {
+                            try {
+                                $Manager = Get-MgUserManager -UserId $UserUPN -ErrorAction Stop
+                                if ($Manager) {
+                                    $ManagerDetails = Get-MgUser -UserId $Manager.ID
+                                    $Value = @($ManagerDetails.DisplayName, $ManagerDetails.UserPrincipalName, $ManagerDetails.Id)
+                                }
+                            }
+                            catch {
+                                Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN : "
+                                Write-Host -ForegroundColor Red $_.Exception
+                            }
+                        }
+                        default {
+                            try {
+                                $Result = Get-MgUser -UserId $UserUPN -Property $Prop -ErrorAction Stop
+                                $Value = $Result.$Prop
+                            }
+                            catch {
+                                Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN : "
+                                Write-Host -ForegroundColor Red $_.Exception
+                            }
+                        }
                     }
                 }
-                catch{
-                    Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN : "
-                    Write-Host -ForegroundColor Red $_.Exception
-                }
-            }
-            "manager" {
-                
-                try {
-                    $Manager = Get-MgUserManager -UserId $UserUPN -ErrorAction Stop
-                    if ($Manager) {
-                    $ManagerDetails = Get-MgUser -UserId $Manager.ID
-                    $Value = @($ManagerDetails.DisplayName, $ManagerDetails.UserPrincipalName, $ManagerDetails.Id)
-                }
-                }
                 catch {
-                    Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN : "
-                    Write-Host -ForegroundColor Red $_.Exception
+                    Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN, $Prop may not be applied"
+                    $Value = "N/A"
                 }
-                
+
+                # Normalize value (if still null or empty)
+                if (-not $Value) {
+                    $Value = "N/A"
+                }
+
+                # Add object to array
+                $ArrayJobAttributes += [PSCustomObject]@{
+                    Attribute = $Prop
+                    Value     = ($Value -join ', ')
+                }
+            
             }
-            default {
-                try {
-                    $Result = Get-MgUser -UserId $UserUPN -Property $Prop -ErrorAction Stop
-                    $Value = $Result.$Prop
-                }
-                catch {
-                    Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN : "
-                    Write-Host -ForegroundColor Red $_.Exception
-                }
-                
-            }
+            
+            $JobAttributeOutput = New-Object PSObject
+
+            foreach ($Attr in $ArrayJobAttributes) {
+                    $JobAttributeOutput | Add-Member -MemberType NoteProperty -Name $Attr.Attribute -Value $Attr.Value
+                    }
+            return $JobAttributeOutput
         }
-    }
-    catch {
-        Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN, $Prop may not be applied"
-        $Value = "N/A"
+        
     }
 
-    # Normalize value (if still null or empty)
-    if (-not $Value) {
-        $Value = "N/A"
-    }
+    switch ($SingleUser) {
 
-    # Add object to array
-    $ArrayJobAttributes += [PSCustomObject]@{
-        Attribute = $Prop
-        Value     = ($Value -join ', ')
-    }
-}
+                $true {
+                    # Ask user for the UPN
+                    $UserUPN = Read-Host "Please enter the UPN of the user in question to show its Mg Identity-based attributes"
 
-# Show output
-$ArrayJobAttributes | Format-Table -AutoSize
+                    # Loop through each attribute
+                    foreach ($Prop in $JobInfoAttributeValues) {
+                        $Value = $null
 
+                        try {
+                            switch ($Prop) {
+                                "sponsors" {
+                                    try {
+                                        $Sponsor = Get-MgUserSponsor -UserId $UserUPN -ErrorAction Stop
+                                        if ($Sponsor) {
+                                            $SponsorDetails = Get-MgUser -UserId $Sponsor.ID
+                                            $Value = @($SponsorDetails.DisplayName, $SponsorDetails.UserPrincipalName, $SponsorDetails.Id)
+                                        }
+                                    }
+                                    catch {
+                                        Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN : "
+                                        Write-Host -ForegroundColor Red $_.Exception
+                                    }
+                                }
+                                "manager" {
+                                    try {
+                                        $Manager = Get-MgUserManager -UserId $UserUPN -ErrorAction Stop
+                                        if ($Manager) {
+                                            $ManagerDetails = Get-MgUser -UserId $Manager.ID
+                                            $Value = @($ManagerDetails.DisplayName, $ManagerDetails.UserPrincipalName, $ManagerDetails.Id)
+                                        }
+                                    }
+                                    catch {
+                                        Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN : "
+                                        Write-Host -ForegroundColor Red $_.Exception
+                                    }
+                                }
+                                default {
+                                    try {
+                                        $Result = Get-MgUser -UserId $UserUPN -Property $Prop -ErrorAction Stop
+                                        $Value = $Result.$Prop
+                                    }
+                                    catch {
+                                        Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN : "
+                                        Write-Host -ForegroundColor Red $_.Exception
+                                    }
+                                }
+                            }
+                        }
+                        catch {
+                            Write-Host -ForegroundColor Yellow "Failed to retrieve $Prop for $UserUPN, $Prop may not be applied"
+                            $Value = "N/A"
+                        }
+
+                        # Normalize value (if still null or empty)
+                        if (-not $Value) {
+                            $Value = "N/A"
+                        }
+
+                        # Add object to array
+                        $ArrayJobAttributes += [PSCustomObject]@{
+                            Attribute = $Prop
+                            Value     = ($Value -join ', ')
+                        }
+                    }
+                    
+                    $JobAttributeOutput = New-Object PSObject
+
+                    foreach ($Attr in $ArrayJobAttributes) {
+                    $JobAttributeOutput | Add-Member -MemberType NoteProperty -Name $Attr.Attribute -Value $Attr.Value
+                    }
+                    # Show output
+                    $JobAttributeOutput | Format-List 
+                }
+            }
 }

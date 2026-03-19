@@ -57,6 +57,7 @@ $BasePath = "$env:USERPROFILE\Documents\EntraController"
 . "$BasePath\AttributeAnalysis\Get-EzOnPremAttribute.ps1"
 . "$BasePath\AttributeAnalysis\Get-EzOnPremExtAttribute.ps1"
 . "$BasePath\AttributeAnalysis\Get-BulkEzOnPremExtAttribute.ps1"
+. "$BasePath\AttributeAnalysis\Get-BulkEzJobAttributeByGroup.ps1"
 
 # Licenses
 . "$BasePath\Licenses\Get-EzLicense.ps1"
@@ -132,14 +133,17 @@ function Start-EzEntraController {
             Write-Host "5) Get OnPrem Extension Attributes - (ExtensionAttribute 1, 2, 3 etc...)"
             Write-Host "--------- Bulk Actions -----------"
             Write-Host "6) Get Entra Bulk OnPrem Extension Attributes - (Extension Attribute 1, 2, 3 etc...)"
+            Write-Host "7) Get Entra Job Attributes by GROUP - Pull Job Attributes for all members of a group or MANY groups"
+
             $UserSelection = Read-Host "Select an Option, press X to return to the main menu"
             switch($UserSelection){
-                "1" { Get-EzJobAttribute }
+                "1" { Get-EzJobAttribute -SingleUser }
                 "2" { Get-EzIdentityAttribute }
                 "3" { Get-EzContactInfo }
                 "4" { Get-EzOnPremAttribute }
                 "5" { Get-EzOnPremExtAttribute -ActionType }
                 "6" { Get-BulkEzOnPremExtAttribute }
+                "7" { Get-EzJobAttributeByGroup }
                 "X" {$UserConfirm = $true}
             }
             
