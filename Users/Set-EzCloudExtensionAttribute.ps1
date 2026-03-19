@@ -122,7 +122,7 @@ while (-not $confirmed){
             try {
                 $Group = Get-MgGroup -Filter "displayName eq '$($GroupSelection)'" -ErrorAction Stop
                 $Users = $null
-                $Users = Get-MgGroupMemberAsUser -GroupId $Group.Id -ErrorAction Stop | Select-Object userPrincipalName
+                $Users = Get-MgGroupMemberAsUser -All -GroupId $Group.Id -ErrorAction Stop | Select-Object userPrincipalName
 
                 #ask user to confirm the selection
                 $ConfirmAttributeApply = $false
