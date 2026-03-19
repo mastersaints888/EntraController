@@ -89,6 +89,8 @@ $BasePath = "$env:USERPROFILE\Documents\EntraController"
 #Access Packages
 . "$BasePath\AccessPackages\New-EZBulkAccessPackageSecurityGroupAssignment.ps1"
 . "$BasePath\AccessPackages\New-EzAccessPackages.ps1"
+. "$BasePath\AccessPackages\New-EzAPUserAdminAssignment.ps1"
+. "$BasePath\AccessPackages\Start-EzAPReprocessing.ps1"
 
 
 Import-EzModuleDependencies
@@ -300,10 +302,14 @@ function Start-EzAccessPackages {
             
             Write-Host "1) Add Bulk Group Resources to a Catalog and and Access Package"
             Write-Host "2) Create and Access Packages (Bulk or Single)"
+            Write-Host "3) Bulk Assign Users to an access package by admin assignment"
+            Write-Host "4) Reprocess ALL User assignments in an access package"
             $UserSelection = Read-Host "Select an Option, press X to return to the main menu"
             switch($UserSelection){
                 "1" { New-EZBulkAccessPackageSecurityGroupAssignment }
                 "2" { New-EzAccessPackages }
+                "3" { New-EzAPUserAdminAssignment }
+                "4" { Start-EzAPReprocessing }
                 "X" {$UserConfirm = $true}
             }
             
