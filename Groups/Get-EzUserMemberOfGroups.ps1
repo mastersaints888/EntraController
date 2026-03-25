@@ -55,7 +55,7 @@ function Get-EzUserMemberOfGroups {
 
                     # Get the group membership (as groups) for the current user
                     try {
-                        $GroupIds = Get-MgUserMemberOfAsGroup -UserId $User.Id -ErrorAction Stop
+                        $GroupIds = Get-MgUserMemberOfAsGroup -UserId $User.Id -All -ErrorAction Stop
                     }
                     catch {
                         Write-Host -ForegroundColor Yellow "Warning: Failed to retrieve memberships for user $($User.UserPrincipalName): $($_.exception)"
@@ -207,7 +207,7 @@ function Get-EzUserMemberOfGroups {
 
                     # Get group membership (as groups) for the current user
                     try {
-                        $GroupIds = Get-MgUserMemberOfAsGroup -UserId $User.Id -ErrorAction Stop
+                        $GroupIds = Get-MgUserMemberOfAsGroup -UserId $User.Id -All -ErrorAction Stop
                     }
                     catch {
                         Write-Host -ForegroundColor Red "Warning: Failed to retrieve memberships for user $($User.UserPrincipalName): $($_.exception)"
