@@ -10,7 +10,7 @@ function Import-EzModuleDependencies {
         "Microsoft.Graph.Users",
         "ImportExcel",
         "Microsoft.Graph.Applications",
-        "Microsoft.Graph.Identity.DirectoryManagement"
+        "Microsoft.Graph.Identity.DirectoryManagement",
         "Microsoft.Graph.Identity.Governance"
     )
 
