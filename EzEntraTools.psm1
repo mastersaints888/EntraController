@@ -12,7 +12,7 @@ function Import-EzModuleDependencies {
         "Microsoft.Graph.Applications",
         "Microsoft.Graph.Identity.DirectoryManagement",
         "Microsoft.Graph.Identity.Governance",
-        "ThreadJob"
+        "Microsoft.PowerShell.ThreadJob"
     )
 
     foreach ($Module in $ModuleDependencies) {
@@ -34,7 +34,7 @@ function Import-EzModuleDependencies {
     try {
         Write-Host "Connecting to Graph, and Az..." -ForegroundColor Green
         #Connect-Entra -Scopes 'User.Read.All', 'Group.ReadWrite.All'
-        Connect-MgGraph -Scope 'User.ReadWrite.All', 'Directory.ReadWrite.All', 'Group.ReadWrite.All', 'Application.ReadWrite.All', 'EntitlementManagement.ReadWrite.All'
+        Connect-MgGraph -Scope 'User.ReadWrite.All', 'Directory.ReadWrite.All', 'Group.ReadWrite.All', 'Application.ReadWrite.All', 'EntitlementManagement.ReadWrite.All', "AccessReview.Read.All"
         Connect-AzAccount 
     }
     catch {
@@ -92,9 +92,11 @@ $BasePath = "$env:USERPROFILE\Documents\EntraController"
 . "$BasePath\AccessPackages\New-EzAccessPackages.ps1"
 . "$BasePath\AccessPackages\New-EzAPUserAdminAssignment.ps1"
 . "$BasePath\AccessPackages\Start-EzAPReprocessing.ps1"
+. "$BasePath\AccessPackages\Get-EzAccessReviewStatus.ps1"
 
 #Caching
 . "$BasePath\Cache\RbacCache.ps1"
+
 
 
 Import-EzModuleDependencies
@@ -310,12 +312,14 @@ function Start-EzAccessPackages {
             Write-Host "2) Create and Access Packages (Bulk or Single)"
             Write-Host "3) Bulk Assign Users to an access package by admin assignment"
             Write-Host "4) Reprocess ALL User assignments in an access package"
+            Write-Host "5) Get Access Review Status for ALL Access Packages in the tenant"
             $UserSelection = Read-Host "Select an Option, press X to return to the main menu"
             switch($UserSelection){
                 "1" { New-EZBulkAccessPackageSecurityGroupAssignment }
                 "2" { New-EzAccessPackages }
                 "3" { New-EzAPUserAdminAssignment }
                 "4" { Start-EzAPReprocessing }
+                "5" { Get-EzAccessReviewStatus }
                 "X" {$UserConfirm = $true}
             }
             
