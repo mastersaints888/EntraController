@@ -11,7 +11,8 @@ function Import-EzModuleDependencies {
         "ImportExcel",
         "Microsoft.Graph.Applications",
         "Microsoft.Graph.Identity.DirectoryManagement",
-        "Microsoft.Graph.Identity.Governance"
+        "Microsoft.Graph.Identity.Governance",
+        "ThreadJob"
     )
 
     foreach ($Module in $ModuleDependencies) {
@@ -92,6 +93,9 @@ $BasePath = "$env:USERPROFILE\Documents\EntraController"
 . "$BasePath\AccessPackages\New-EzAPUserAdminAssignment.ps1"
 . "$BasePath\AccessPackages\Start-EzAPReprocessing.ps1"
 
+#Caching
+. "$BasePath\Cache\RbacCache.ps1"
+
 
 Import-EzModuleDependencies
 
@@ -109,10 +113,12 @@ function Start-EzEntraController {
             
             Write-Host "1) Pull Rbac Report"
             Write-Host "2) Design Bulk Rbac Infrastructure"
+            Write-Host "3) Manually update the Rbac Cache - Do this if you recently made changes to your RBAC and want to update the cache immediately `nNOTE: runs every 15 minutes automatically in the background"
             $UserSelection = Read-Host "Select an Option, press X to return to the main menu"
             switch($UserSelection){
                 "1" {Get-EzRbacReport}
                 "2" {Set-EzBulkRbac}
+                "3" {Start-EzRbacDataBaseUpdate}
                 "X" {$UserConfirm = $true}
             }
             
@@ -333,6 +339,12 @@ function Start-EzAccessPackages {
         }
 
     }
+
+#start the RBAC cache update job in the background to keep the cache fresh for any RBAC related actions in the tool
+#this will update every 60 minutes with the latest data from Azure and Graph. 
+#You can also manually trigger an update from the RBAC menu if you recently made changes and want to see them reflected immediately in the cache.
+    
+    Start-EzRbacDataBaseUpdateJob | Out-Null
 
 $Banner = @'                                                                                                                                                      
   _____       _                ____            _             _ _           

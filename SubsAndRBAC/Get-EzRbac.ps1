@@ -467,19 +467,14 @@ param(
     [switch]$cleanview
 )
 
-$SubCache = @{}
-$SubCache += Get-RbacCache -subcache
 
-$MgCache = @{}
-$MgCache += Get-RbacCache -mancache
+#Get the cached data from the Get-RbacCache function and assign to variables for use in the report generation for a quicker cache
 
-#foreach($Sub in $Cache.)
+$SubCache = Import-Clixml -Path "$env:TEMP\subCache.xml"
 
+$MgCache = Import-Clixml -Path "$env:TEMP\mgCache.xml"
 
 #building out a report cache for all subs root and resource groups then need to throw into the Get-AzRoleAssignment -scope 
-
-
-
 
 $EnvPath = $env:USERPROFILE 
 
